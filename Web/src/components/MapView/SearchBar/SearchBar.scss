@@ -1,0 +1,83 @@
+@import '../../../styles/utilities/Colors.scss';
+
+*:focus{
+    outline: none;
+}
+
+$form-width: 20rem;
+$input-field: 17.5rem;
+
+.search-bar:focus-within {
+    & ~ .InteractionMenu {
+        transform: translateX(0px);
+    }
+
+    & ~ .InteractionMenu .InteractionMenu {
+        &__search-bar {
+            min-height: 7.5rem;
+        }
+    }
+}
+
+.search-bar {
+    position: fixed;
+    right: 0;
+    margin: 1rem;
+    width: $form-width;
+    z-index: 2000;
+    height: 2.5rem;
+    transition: all 0.1s ease-in-out;
+
+    :focus-within {
+        .search-bar {
+            &__input--slide, &__button--slide {
+                z-index: 1;
+                transform: translateY(3rem);
+            }
+        }
+    }
+
+    &__button--slide {
+        z-index: -1;
+        position: absolute;
+        right: 0;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    &__input {
+        box-sizing: border-box;
+        height: 2.5rem;
+        padding: 0.5rem;
+        border: 0;
+        vertical-align: top;
+        flex: 1 0 auto;
+
+        &--slide {
+            z-index: -1;
+            position: absolute;
+            width: ($form-width - 2.5rem);
+            transform: translateY(0rem);
+            transition: all 0.2s ease-in-out;
+        }
+
+        &--autocomplete {
+            position: absolute;
+            top: 3.5rem;
+            list-style: none; 
+            width: ($form-width - 2.5rem); 
+            background-color: beige;
+            display: none;
+
+            > li {
+                border-bottom: 1px solid grey;
+                padding: 0.5rem;
+
+                span {
+                    display: block;
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,45 @@
+.button {
+    display: inline-block;
+    vertical-align: top;
+    border: none;
+    margin: 0;
+    text-decoration: none;
+    font-family: sans-serif;
+    cursor: pointer;
+    text-align: center;
+    transition: background 250ms ease-in-out, 
+                transform 150ms ease;
+    height: 2.5rem;
+    padding: 0.5rem;
+
+    &--square {
+        width: 2.5rem;
+    }
+
+    &--color-1 {
+        color: #2b2b2b;
+        background-color: white;
+
+        &:hover, &:focus {
+            background-color: rgba(white, 0.5);
+        }
+    }
+
+    &--color-2 {
+        color: #ffffff;
+        background-color: $color2;
+
+        &:hover, &:focus {
+            background-color: rgba($color2, 0.5);
+        }
+    }
+
+    &--color-5 {
+        color: #ffffff;
+        background-color: $color5;
+
+        &:hover, &:focus {
+            background-color: rgba($color5, 0.5);
+        }
+    }
+}

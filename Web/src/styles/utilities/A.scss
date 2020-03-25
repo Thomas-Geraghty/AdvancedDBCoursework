@@ -1,0 +1,12 @@
+a {
+    &:link, &:visited, &:active {
+        text-decoration: none;
+        -webkit-transition-duration: 0.4s;
+        transition-duration: 0.4s;
+        color: lightgray;
+    } 
+
+    &:hover {
+        color: white;
+    }
+}

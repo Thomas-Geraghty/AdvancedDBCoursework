@@ -1,0 +1,33 @@
+.services__list {
+    font-family: 'Ticker';
+    padding: 0 0.5rem;
+
+    &--title {
+        font-family: inherit;
+        font-weight: normal;
+        display: inline-block;
+        color: wheat;
+        background-color: #494949;
+        text-transform: uppercase;
+        padding: 0.5rem;
+        margin: 0 0 0.5rem;
+    }
+
+    &--list {
+        list-style: none;
+        font-family: inherit;
+        text-transform: uppercase;
+
+        li {
+            font-family: inherit;
+            padding: 0.5rem;
+            background-color: #313131 !important;
+            display: inline-block;
+            cursor: pointer;
+
+            &:hover, &.active {
+                filter: brightness(150%);
+            }
+        }
+    }
+}

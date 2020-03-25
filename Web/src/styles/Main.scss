@@ -1,0 +1,25 @@
+// Utilities
+@import './utilities/Colors.scss';
+@import './utilities/Body.scss';
+@import './utilities/Button.scss';
+@import './utilities/Forms.scss';
+@import './utilities/A.scss';
+@import './utilities/H.scss';
+@import './utilities/P.scss';
+@import './utilities/Pill.scss';
+@import './utilities/List.scss';
+
+// Components
+@import '../components/Header/Header.scss';
+@import '../components/Footer/Footer.scss';
+@import '../components/Content/Content.scss';
+
+@font-face {
+    font-family: 'Ticker';
+    src:url('PIDvl.ttf.woff') format('woff'),
+        url('PIDvl.ttf.svg#PIDvl') format('svg'),
+        url('PIDvl.ttf.eot'),
+        url('PIDvl.ttf.eot?#iefix') format('embedded-opentype'); 
+    font-weight: normal;
+    font-style: normal;
+}

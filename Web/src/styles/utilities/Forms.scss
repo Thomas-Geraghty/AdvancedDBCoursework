@@ -1,0 +1,41 @@
+textarea:focus, input:focus, button:focus{
+    outline: none;
+}
+
+.form  {
+    display: flex;
+
+    &__input {
+        box-sizing: border-box;
+        height: 2.5rem;
+        padding: 0.5rem;
+        border-right: 0px;
+        border: 1px $color5 solid;
+        vertical-align: top;
+        flex: 1 0 auto;
+
+        &--autocomplete {
+            position: absolute;
+            top: 3.5rem;
+            list-style: none; 
+            width: calc(100% - 4.5rem); 
+            background-color: beige;
+            display: none;
+
+            > li {
+                border-bottom: 1px solid grey;
+                padding: 0.5rem;
+
+                span {
+                    display: block;
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                }
+            }
+        }
+    }
+}
+
+.form__input:hover ~ .form__input--autocomplete, .form__input:focus ~ .form__input--autocomplete, .form__input--autocomplete:hover {
+    display: block;
+}

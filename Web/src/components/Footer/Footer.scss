@@ -1,0 +1,13 @@
+$footer-height: 60px;
+
+.footer {
+    height: $footer-height;
+    background-color: $color1;
+    padding: 0 0.5rem;
+
+    p {
+    margin: 0;
+    line-height: $footer-height;
+    color: white;
+    }
+}

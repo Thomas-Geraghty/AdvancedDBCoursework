@@ -1,0 +1,32 @@
+.header {
+    height: 60px;
+    background-color: $color1;
+    padding: 0 0.5rem;
+
+    h1 {
+        font-size: 2rem;
+        color: white;
+        display: inline-block;
+        margin: 0;
+        padding: 0.5rem;
+    }
+
+    nav {
+        vertical-align: top;
+        float: right;
+
+        a {
+            display: inline-block;
+            padding: 1.25rem;
+            height: 1.25rem;
+
+            &:hover {
+                background-color: $color4;
+            }
+
+            &.active {
+                background-color: $color5;
+            }
+        }
+    }
+}
