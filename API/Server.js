@@ -10,22 +10,47 @@ app.set('json spaces', 4)
 crimesController.intialize.then(() => { routes() });
 
 function routes() {
-  app.get('/API/Crimes', (req, res) => {
+  app.get('/api/crimes/', (req, res) => {
     const index = req.query.index;
     const limit = req.query.limit
 
-    res.json(crimesController.getCrimes(index, limit));
+    crimesController.getCrimes(index, limit).then(result => {
+      res.json(result);
+    });
   });
 
-  app.get('/API/Crimes/:id', (req, res) => {
+  app.get('/api/crimes/:id', (req, res) => {
     const id = req.params.id;
 
-    res.json(crimesController.getCrime(id));
+    crimesController.getCrime(id).then(result => {
+      res.json(result);
+    });
   });
+
+  app.get('/api/crimes/nearby', (req, res) => {
+    const location = {
+      lat = req.query.lat,
+      lng = req.query.lng
+    }
+    const distance = req.query.dist;
+
+    crimesController.getCrimesNearby(location, distance)
+    .then(result => {
+      res.json(result);
+    })
+  });
+
+  app.get('/api/crimes/:region/', (req, res) => {
+    const index = req.query.index;
+    const limit = req.query.limit
+    const region = req.params.region;
+
+    res.json(crimesController.getCrimesByRegion(region, index, limit));
+  });
+
 }
 
 var server = app.listen(config.server.port, config.server.host, () => {
   var host = server.address().address
   var port = server.address().port
-  console.log("Example app listening at http://%s:%s", host, port)
 })
