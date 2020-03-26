@@ -41,11 +41,20 @@ module.exports = {
         })
     },
 
-    getDistinct: (collection, query) => {
+
+    getDistinct: (collection, options) => {
+        if(typeof options.query !== undefined) { options.query = {} };
+        if(typeof options.fields !== undefined) { options.fields = { _id: 0 } };
+        if(typeof options.index !== undefined) { options.index = 0 };
+        if(typeof options.limit !== undefined) { options.limit = 0 };
+
         return new Promise((resolve) => {
-            _db.collection(collection).distinct(query, { projection: { _id: 0 } }).toArray((err, result) => {
-                resolve(result)
-            });
+            _db.collection(collection).distinct(options.query, { projection: options.fields })
+                .skip(options.index)
+                .limit(options.limit)
+                .toArray((err, result) => {
+                    resolve(result)
+                });
         })
     }
 };
