@@ -40,14 +40,13 @@ function routes() {
     })
   });
 
-  app.get('/api/crimes/:region/', (req, res) => {
-    const index = req.query.index;
-    const limit = req.query.limit
-    const region = req.params.region;
-
-    res.json(crimesController.getCrimesByRegion(region, index, limit));
+  app.get('/api/crimes/regions/', (req, res) => {
+    res.json(crimesController.getRegions);
   });
 
+  app.get('/api/crimes/types/', (req, res) => {
+    res.json(crimesController.getCrimeTypes);
+  });
 }
 
 var server = app.listen(config.server.port, config.server.host, () => {
