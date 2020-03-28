@@ -22,6 +22,7 @@ var regions = [
     "Thames Valley Police", "Warwickshire Police", "West Mercia Police",
     "West Midlands Police", "West Yorkshire Police", "Wiltshire Police"
 ];
+var outcomes = [];
 
 function intialize() {
     return new Promise((resolve) => {
@@ -29,7 +30,7 @@ function intialize() {
         .then(() => {
             var promises = [
                 new Promise((resolve) => {
-                    mongodb.getDistinct('crimes', { query: "crime_type", fields: { falls_within: 1 } })
+                    mongodb.getDistinct('crimes', { query: "crime_type", fields: { crime_type: 1 } })
                     .then(result => {
                         console.log(result)
                         crimeTypes = result;
@@ -42,6 +43,15 @@ function intialize() {
                     .then(result => {
                         console.log(result)
                         regions = result;
+                        resolve();
+                    });
+                }),
+
+                new Promise((resolve) => {
+                    mongodb.getDistinct('crimes', { query: "last_outcome_category", fields: { last_outcome_category: 1 } })
+                    .then(result => {
+                        console.log(result)
+                        outcomes = result;
                         resolve();
                     });
                 })
@@ -60,6 +70,10 @@ function getCrimeTypes() {
 
 function getRegions() {
     return regions;
+}
+
+function getOutcomes() {
+    return outcomes;
 }
 
 function getCrimes(index, limit) {
@@ -134,6 +148,7 @@ module.exports = {
     intialize: intialize,
     getCrimeTypes: getCrimeTypes,
     getRegions: getRegions,
+    getOutcomes: getOutcomes,
 
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,
