@@ -4,10 +4,9 @@ class Header extends Component {
     render() {
         return (
             <div className="header">
-                <h1 className="title">Public Transport SPA</h1>
+                <h1 className="title">UK Police Data</h1>
                 <nav>
                     <NavLink to="/map">Map</NavLink>
-                    <NavLink to="/list">List</NavLink>
                 </nav>
             </div>
         )
