@@ -76,7 +76,6 @@ export default function LeafletMap() {
 
     // Render
     return (
-        console.log('maprender'),
         <Map
             viewport={mState.viewport}
             onViewportChanged={(newviewport) => { mDispatch({ type: 'SET_VIEWPORT', payload: newviewport }) }}

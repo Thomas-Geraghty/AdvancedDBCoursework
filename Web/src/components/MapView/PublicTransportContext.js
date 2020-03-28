@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { MainContext } from './MainContext'
-import { getNearbyStops, getStopAdvanced } from '../../client/API';
+import { getNearbyStops, getStopAdvanced, getNearbyCrimes } from '../../client/API';
 
 export const PublicTransportContext = React.createContext();
 
@@ -36,21 +36,10 @@ export default ({ children }) => {
   const [ ptState, ptDispatch ] = React.useReducer(reducer, initialState)
   const { mState } = React.useContext(MainContext);
 
-  // Get Stop Data
-  useEffect(() => {
-    if (ptState.activeStopID) {
-      getStopAdvanced(ptState.activeStopID)
-        .then(result => {
-          ptDispatch({ type: 'SET_DATA', payload: result });
-        })
-    }
-  }, [ptState.activeStopID])
-
-  // Get Nearby Stop Data
+  // Get Nearby Crime Data
   useEffect(() => {
     if (mState.viewport) {
-      console.log(mState.viewport)
-      getNearbyStops(mState.viewport.center, Math.pow((20 - mState.viewport.zoom), 2.5) * 30)
+      getNearbyCrimes(mState.viewport.center, Math.pow((20 - mState.viewport.zoom), 2.5) * 30)
         .then(result => {
           ptDispatch({ type: 'SET_NEARBY', payload: result })
         });
