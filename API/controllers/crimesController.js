@@ -41,7 +41,7 @@ function getCrimesNearby(location, distance) {
             $nearSphere: {
                 $geometry: {
                     type: "Point",
-                    coordinates: [location.lat, location.lon]
+                    coordinates: [location.lon, location.lat]
                 },
                 $maxDistance: distance
             }
