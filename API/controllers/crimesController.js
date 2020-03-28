@@ -10,7 +10,7 @@ function intialize() {
             mongodb.getDistinct('crimes', { query: "crime_type", fields: { falls_within: 1 } })
             .then(result => {
                 console.log(result)
-                regions = result;
+                crimeTypes = result;
                 resolve();
             });
             mongodb.getDistinct('crimes', { query: "falls_within", fields: { falls_within: 1 } })
