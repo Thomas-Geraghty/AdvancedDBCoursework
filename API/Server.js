@@ -34,10 +34,10 @@ function routes() {
 
   app.get('/api/crimes/nearby', (req, res) => {
     const location = {
-      lat: req.query.lat,
-      lng: req.query.lng
+      lat: parseFloat(req.query.lat),
+      lon: parseFloat(req.query.lon)
     }
-    const distance = req.query.dist;
+    const distance = parseInt(req.query.dist);
 
     crimesController.getCrimesNearby(location, distance)
     .then(result => {
