@@ -10,11 +10,13 @@ import MapView from "./MapView/MapView.js";
 class Main extends Component {
     render() {
         return (
-            <Header />
-            <div className="content">
-                <MapView />
-            </div>
-            <Footer />
+            <HashRouter>
+                <Header />
+                <div className="content">
+                    <MapView />
+                </div>
+                <Footer />
+            </HashRouter>
         );
     }
 }
