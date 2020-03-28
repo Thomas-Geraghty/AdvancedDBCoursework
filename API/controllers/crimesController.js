@@ -1,24 +1,55 @@
 const mongodb = require('../data/mongodb')
 
-var crimeTypes = [];
-var regions = [];
+var crimeTypes = [
+    "Anti-social behaviour", "Bicycle theft", "Burglary", "Criminal damage and arson",
+    "Drugs", "Other crime", "Other theft", "Possession of weapons", "Public order", 
+    "Robbery", "Shoplifting", "Theft from the person", "Vehicle crime",
+];
+var regions = [
+    "Avon and Somerset Constabulary", "Bedfordshire Police", "British Transport Police",
+    "Cambridgeshire Constabulary", "Cheshire Constabulary", "City of London Police",
+    "Cleveland Police", "Cumbria Constabulary", "Derbyshire Constabulary",
+    "Devon & Cornwall Police", "Dorset Police", "Durham Constabulary",
+    "Dyfed-Powys Police", "Essex Police", "Gloucestershire Constabulary",
+    "Greater Manchester Police", "Gwent Police", "Hampshire Constabulary",
+    "Hertfordshire Constabulary", "Humberside Police", "Kent Police",
+    "Lancashire Constabulary", "Leicestershire Police", "Lincolnshire Police",
+    "Merseyside Police", "Metropolitan Police Service", "Norfolk Constabulary",
+    "North Wales Police", "North Yorkshire Police", "Northamptonshire Police",
+    "Northumbria Police", "Nottinghamshire Police", "Police Service of Northern Ireland",
+    "South Wales Police", "South Yorkshire Police", "Staffordshire Police",
+    "Suffolk Constabulary", "Surrey Police", "Sussex Police",
+    "Thames Valley Police", "Warwickshire Police", "West Mercia Police",
+    "West Midlands Police", "West Yorkshire Police", "Wiltshire Police"
+];
 
 function intialize() {
     return new Promise((resolve) => {
         mongodb.intialize()
         .then(() => {
-            mongodb.getDistinct('crimes', { query: "crime_type", fields: { falls_within: 1 } })
-            .then(result => {
-                console.log(result)
-                crimeTypes = result;
+            var promises = [
+                new Promise((resolve) => {
+                    mongodb.getDistinct('crimes', { query: "crime_type", fields: { falls_within: 1 } })
+                    .then(result => {
+                        console.log(result)
+                        crimeTypes = result;
+                        resolve();
+                    });
+                }),
+
+                new Promise((resolve) => {
+                    mongodb.getDistinct('crimes', { query: "falls_within", fields: { falls_within: 1 } })
+                    .then(result => {
+                        console.log(result)
+                        regions = result;
+                        resolve();
+                    });
+                })
+            ]
+
+            Promise.all(promises).then(() => {
                 resolve();
-            });
-            mongodb.getDistinct('crimes', { query: "falls_within", fields: { falls_within: 1 } })
-            .then(result => {
-                console.log(result)
-                regions = result;
-                resolve();
-            });
+            })
         });
     })
 }
