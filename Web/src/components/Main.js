@@ -5,7 +5,6 @@ import '../client/Main.js';
 
 import Header from "./Header/Header.js"
 import Footer from "./Footer/Footer.js"
-import ListView from "./ListView/ListView.js";
 import MapView from "./MapView/MapView.js";
 
 class Main extends Component {
@@ -14,8 +13,7 @@ class Main extends Component {
             <HashRouter>
                 <Header />
                 <div className="content">
-                    <Route path="/map" component={MapView} />
-                    <Route path="/list" component={ListView} />
+                    <MapView />
                 </div>
                 <Footer />
             </HashRouter>

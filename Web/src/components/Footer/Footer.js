@@ -4,7 +4,7 @@ class Footer extends Component {
     render() {
         return (
             <div className="footer">
-                <p>Made with <span style={{color: '#e25555'}}>❤</span> by Tom Geraghty</p>
+                <p>Made with <span style={{color: '#e25555'}}>❤</span> by Tom G and Ollie N</p>
             </div>
         )
     }

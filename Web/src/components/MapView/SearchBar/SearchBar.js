@@ -1,7 +1,6 @@
 import React from "react";
 import "./SearchBar.scss";
 import { MainContext } from '../MainContext';
-import { PublicTransportContext } from '../PublicTransportContext';
 
 export default function MapSearch() {
     const { mDispatch } = React.useContext(MainContext);

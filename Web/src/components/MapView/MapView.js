@@ -1,6 +1,6 @@
 import React from "react";
 import MainContext from './MainContext'
-import PublicTransportContext from './PublicTransportContext'
+import CrimeDataContext from './CrimeDataContext'
 import LeafletMap from './Map/LeafletMap.js';
 import InteractionMenu from "./InteractiveMenu/InteractionMenu";
 import SearchBar from './SearchBar/SearchBar';
@@ -11,11 +11,11 @@ function MapView() {
   return (
     <div className="MapView">
       <MainContext>
-        <PublicTransportContext>
+        <CrimeDataContext>
           <SearchBar />
           <LeafletMap />
           <InteractionMenu />
-        </PublicTransportContext>
+        </CrimeDataContext>
       </MainContext>
     </div>
   )
