@@ -7,30 +7,20 @@ app.use(cors());
 app.options('*', cors());
 app.set('json spaces', 4)
 
-crimesController.intialize().then(() => { 
-  routes() 
+crimesController.intialize().then(() => {
+  console.log('Initialized controller')
+  routes()
 });
 
 function routes() {
   app.get('/api/crimes', (req, res) => {
-    const index = req.query.index;
-    const limit = req.query.limit
+    const index = parseInt(req.query.index)
+    const limit = parseInt(req.query.limit)
 
     crimesController.getCrimes(index, limit).then(result => {
       res.json(result);
     });
   });
-
-  /*
-  app.get('/api/crimes/:id', (req, res) => {
-    const id = req.params.id;
-
-    crimesController.getCrime(id).then(result => {
-      res.json(result);
-    });
-  });
-
-  */
 
   app.get('/api/crimes/search', (req, res) => {
     const index = req.query.index;
@@ -60,15 +50,15 @@ function routes() {
       NE: req.query.ne.split(','),
       SW: req.query.sw.split(',')
     }
-    
+
     crimesController.getHeatmap(boundingBox);
   });
 
-  app.get('/api/crimes/regions/', (req, res) => {
+  app.get('/api/crimes/regions', (req, res) => {
     res.json(crimesController.getRegions);
   });
 
-  app.get('/api/crimes/types/', (req, res) => {
+  app.get('/api/crimes/types', (req, res) => {
     res.json(crimesController.getCrimeTypes);
   });
 
