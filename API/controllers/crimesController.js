@@ -7,26 +7,18 @@ function intialize() {
     return new Promise((resolve) => {
         mongodb.intialize()
         .then(() => {
-            var promises = [
-                new Promise(resolve, () => {
-                    mongodb.getDistinct('PoliceData', { query: { CrimeType: '*' }, fields: { CrimeType: 1 } })
-                    .then(result => {
-                        crimeTypes = result;
-                        resolve();
-                    });
-                }),
-                new Promise(resolve, () => {
-                    mongodb.getDistinct('PoliceData', { query: { FallsWithin: '*' }, fields: { FallsWithin: 1 } })
-                    .then(result => {
-                        regions = result;
-                        resolve();
-                    });
-                })
-            ]
-
-            Promise.all(promises).then(() => {
+            mongodb.getDistinct('crimes', { query: "crime_type", fields: { falls_within: 1 } })
+            .then(result => {
+                console.log(result)
+                regions = result;
                 resolve();
-            })
+            });
+            mongodb.getDistinct('crimes', { query: "falls_within", fields: { falls_within: 1 } })
+            .then(result => {
+                console.log(result)
+                regions = result;
+                resolve();
+            });
         });
     })
 }
@@ -39,12 +31,8 @@ function getRegions() {
     return regions;
 }
 
-function getCrime(id) {
-    return mongodb.getRecords('PoliceData', { query: { CrimeId: id } });
-}
-
 function getCrimes(index, limit) {
-    return mongodb.getRecords('PoliceData', { index: index, limit: limit });
+    return mongodb.getRecords('crimes', { index: index, limit: limit });
 }
 
 function getCrimesNearby(location, distance) {
@@ -60,19 +48,19 @@ function getCrimesNearby(location, distance) {
         }
     }
 
-    return mongodb.getRecords('PoliceData', { query: query });
+    return mongodb.getRecords('crimes', { query: query });
 }
 
 function getCrimesByType(type) {
-    return mongodb.getRecords('PoliceData', { query: { CrimeType: type } });
+    return mongodb.getRecords('crimes', { query: { CrimeType: type } });
 }
 
 function getCrimesByRegion(region, index, limit) {
-    return mongodb.getRecords('PoliceData', { query: { CrimeType: region }, index: index, limit: limit });
+    return mongodb.getRecords('crimes', { query: { CrimeType: region }, index: index, limit: limit });
 }
 
 function getSearchResults(query) {
-    return mongodb.getRecords('PoliceData', { query: { $text: { $search: query } } });
+    return mongodb.getRecords('crimes', { query: { $text: { $search: query } } });
 }
 
 function getHeatmap(boundingBox, divisions) {
@@ -116,7 +104,6 @@ module.exports = {
     getCrimeTypes: getCrimeTypes,
     getRegions: getRegions,
 
-    getCrime: getCrime,
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,
     getCrimesByType: getCrimesByType,
