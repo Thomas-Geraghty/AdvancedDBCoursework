@@ -52,11 +52,11 @@ function getCrimesNearby(location, distance) {
 }
 
 function getCrimesByType(type) {
-    return mongodb.getRecords('crimes', { query: { CrimeType: type } });
+    return mongodb.getRecords('crimes', { query: { crime_type: type } });
 }
 
 function getCrimesByRegion(region, index, limit) {
-    return mongodb.getRecords('crimes', { query: { CrimeType: region }, index: index, limit: limit });
+    return mongodb.getRecords('crimes', { query: { crime_type: region }, index: index, limit: limit });
 }
 
 function getSearchResults(query) {
