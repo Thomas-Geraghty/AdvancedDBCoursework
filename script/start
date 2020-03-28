@@ -1,0 +1,4 @@
+#!/bin/bash
+
+script/start_api &
+script/start_ui
