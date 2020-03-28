@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 export const MainContext = React.createContext()
 
 const initialState = {
-    viewport: null,
+    viewport: { center: [52.4862, -1.8904], zoom: 16 },
     location: null
 };
 
@@ -19,6 +19,7 @@ const reducer = (state, action) => {
 export default ({ children }) => {
     const [mState, mDispatch] = React.useReducer(reducer, initialState)
 
+    /*
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
@@ -40,6 +41,7 @@ export default ({ children }) => {
         {enableHighAccuracy: true, timeout: 20000, maximumAge: 250, distanceFilter: 10}
         )
     }, []);
+    */
 
     const Main = { mState, mDispatch }
 
