@@ -5,9 +5,6 @@ class Header extends Component {
         return (
             <div className="header">
                 <h1 className="title">UK Police Data</h1>
-                <nav>
-                    <NavLink to="/map">Map</NavLink>
-                </nav>
             </div>
         )
     }
