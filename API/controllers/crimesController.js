@@ -2,21 +2,25 @@ const mongodb = require('../data/mongodb')
 
 var crimeTypes = [];
 var regions = [];
+var outcomes = []
 
 function intialize() {
     return new Promise((resolve) => {
         mongodb.intialize()
         .then(() => {
-            mongodb.getDistinct('crimes', { query: "crime_type", fields: { falls_within: 1 } })
+            mongodb.getDistinct('crimes', { query: "crime_type" })
             .then(result => {
-                console.log(result)
                 crimeTypes = result;
                 resolve();
             });
-            mongodb.getDistinct('crimes', { query: "falls_within", fields: { falls_within: 1 } })
+            mongodb.getDistinct('crimes', { query: "falls_within" })
             .then(result => {
-                console.log(result)
                 regions = result;
+                resolve();
+            });
+            mongodb.getDistinct('crimes', { query: "last_outcome_category" })
+            .then(result => {
+                outcomes = result;
                 resolve();
             });
         });
@@ -29,6 +33,10 @@ function getCrimeTypes() {
 
 function getRegions() {
     return regions;
+}
+
+function getOutcomes() {
+    return outcomes;
 }
 
 function getCrimes(index, limit) {
@@ -103,6 +111,7 @@ module.exports = {
     intialize: intialize,
     getCrimeTypes: getCrimeTypes,
     getRegions: getRegions,
+    getOutcomes: getOutcomes,
 
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,

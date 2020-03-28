@@ -61,6 +61,10 @@ function routes() {
   app.get('/api/crimes/types', (req, res) => {
     res.json(crimesController.getCrimeTypes());
   });
+
+  app.get('/api/crimes/outcomes', (req, res) => {
+    res.json(crimesController.getOutcomes());
+  });
 }
 
 var server = app.listen(config.server.port, config.server.host, () => {
