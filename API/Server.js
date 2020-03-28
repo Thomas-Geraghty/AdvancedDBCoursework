@@ -55,14 +55,12 @@ function routes() {
   });
 
   app.get('/api/crimes/regions', (req, res) => {
-    res.json(crimesController.getRegions);
+    res.json(crimesController.getRegions());
   });
 
   app.get('/api/crimes/types', (req, res) => {
-    res.json(crimesController.getCrimeTypes);
+    res.json(crimesController.getCrimeTypes());
   });
-
-
 }
 
 var server = app.listen(config.server.port, config.server.host, () => {
