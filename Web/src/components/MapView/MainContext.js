@@ -47,7 +47,20 @@ export default ({ children }) => {
         } else {
             mDispatch({ type: 'SET_VIEWPORT', payload: { center: [52.4862, -1.8904], zoom: 16 } })
         }
+<<<<<<< Updated upstream
     }, [])
+=======
+    })
+
+    useEffect(() => {
+        navigator.geolocation.watchPosition((position) => {
+            mDispatch({ type: 'SET_LOCATION', payload: [position.coords.latitude, position.coords.longitude] })
+        },
+        null,
+        {enableHighAccuracy: true, timeout: 20000, maximumAge: 250, distanceFilter: 10}
+        )
+    }, []);
+>>>>>>> Stashed changes
 
     const Main = { mState, mDispatch }
 
