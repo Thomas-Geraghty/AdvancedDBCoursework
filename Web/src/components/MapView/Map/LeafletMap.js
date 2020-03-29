@@ -35,7 +35,7 @@ export default function LeafletMap() {
             return <Marker
                 position={[crime._id.coordinates[1], crime._id.coordinates[0]]}
                 icon={new L.divIcon({
-                    html: `${svgIconHandler(crime.count)}`
+                    html: `${svgIconHandler(crime.count, crime.distribution_point)}`
                 })}
                 onClick={() => { onClick() }}
             />
@@ -55,7 +55,7 @@ export default function LeafletMap() {
         <Map
             viewport={mState.viewport}
             ref={map}
-            onViewportChanged={(newviewport) => { 
+            onViewportChanged={(newviewport) => {
                 mDispatch({ type: 'SET_VIEWPORT', payload: newviewport });
                 mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() });
             }}
