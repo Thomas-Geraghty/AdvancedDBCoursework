@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import L from 'leaflet';
 import { Map, TileLayer, Marker } from 'react-leaflet'
 import { MainContext } from '../MainContext';
@@ -9,15 +9,14 @@ import './LeafletMap.scss'
 export default function LeafletMap() {
     const { mState, mDispatch } = React.useContext(MainContext);
     const { cState, cDispatch } = React.useContext(CrimeDataContext);
+    const map = React.useRef();
 
     // Creates markers for nearby stops
     function createMarkers() {
-        console.log(cState.nearby);
         if(cState.nearby !== null) {
             var markers = cState.nearby.map(crime => {
                 return createMarker(crime)
             })
-            console.log(markers.length);
             return markers;
         } else {
             return null;
@@ -54,7 +53,10 @@ export default function LeafletMap() {
     return (
         <Map
             viewport={mState.viewport}
-            onViewportChanged={(newviewport) => { mDispatch({ type: 'SET_VIEWPORT', payload: newviewport }) }}
+            ref={map}
+            onViewportChanged={(newviewport) => { 
+                mDispatch({ type: 'SET_VIEWPORT', payload: newviewport });
+            }}
             onClick={() => { cDispatch({ type: 'RESET' }) }}
         >
             <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />

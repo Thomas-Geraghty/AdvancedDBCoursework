@@ -4,15 +4,17 @@ export const MainContext = React.createContext()
 
 const initialState = {
     viewport: null,
+    viewbounds: null,
     location: null
 };
 
 const reducer = (state, action) => {
     switch (action.type) {
         case 'SET_VIEWPORT':
-            console.log(action.payload);
             return { ...state, viewport: action.payload };
         case 'SET_LOCATION':
+            return { ...state, location: action.payload };
+        case 'SET_VIEWBOUNDS':
             return { ...state, location: action.payload };
     }
 };
@@ -20,6 +22,7 @@ const reducer = (state, action) => {
 export default ({ children }) => {
     const [mState, mDispatch] = React.useReducer(reducer, initialState)
 
+    // GPS stuff for setting map to user location
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
@@ -33,7 +36,6 @@ export default ({ children }) => {
         }
     })
 
-    /*
     useEffect(() => {
         navigator.geolocation.watchPosition((position) => {
             mDispatch({ type: 'SET_LOCATION', payload: [position.coords.latitude, position.coords.longitude] })
@@ -42,7 +44,6 @@ export default ({ children }) => {
         {enableHighAccuracy: true, timeout: 20000, maximumAge: 250, distanceFilter: 10}
         )
     }, []);
-    */
 
     const Main = { mState, mDispatch }
 
