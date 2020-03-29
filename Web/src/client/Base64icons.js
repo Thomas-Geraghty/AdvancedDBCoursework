@@ -6,11 +6,12 @@ export const icons = {
 
 export function svgIconHandler(value) {
 
-    value = Math.min(Math.max(value/2, 0), 200)
-    var colorValue = 100 - value;
+    var sizeValue = Math.min(Math.max(value/2, 25), 200)
+    var colorValue = 100 - Math.min(Math.max(value/2, 0), 100);
+
     console.log(value + " : " + colorValue)
-    return `<svg height="${value}" width="${value}">
-                <circle cx="${value/2}" cy="${value/2}" r="${(value/2) * 0.8}" fill=${perc2color(colorValue)} />
+    return `<svg height="${sizeValue}" width="${sizeValue}">
+                <circle cx="${sizeValue/2}" cy="${sizeValue/2}" r="${(sizeValue/2)}" fill=${perc2color(colorValue)} />
             </svg>`
 
     function perc2color(perc) {
