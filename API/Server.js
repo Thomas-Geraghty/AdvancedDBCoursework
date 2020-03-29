@@ -37,9 +37,9 @@ function routes() {
       lat: parseFloat(req.query.lat),
       lon: parseFloat(req.query.lon)
     }
-    const distance = parseInt(req.query.dist);
+    const distance = parseFloat(req.query.dist);
 
-    crimesController.getCrimesNearby(location, distance)
+    crimesController.getCrimesNearby2(location, distance)
     .then(result => {
       res.json(result);
     })
@@ -60,6 +60,10 @@ function routes() {
 
   app.get('/api/crimes/types', (req, res) => {
     res.json(crimesController.getCrimeTypes());
+  });
+
+  app.get('/api/crimes/outcomes', (req, res) => {
+    res.json(crimesController.getOutcomes());
   });
 }
 
