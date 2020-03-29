@@ -53,5 +53,14 @@ module.exports = {
                 resolve(result);
             });
         })
+    },
+
+    getAggregate: (collection, aggregate) => {
+        return new Promise((resolve) => {
+            _db.collection(collection).aggregate(aggregate)
+            .toArray((err, result) => {
+                resolve(result)
+            });
+        })
     }
 };
