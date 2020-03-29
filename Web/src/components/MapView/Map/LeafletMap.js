@@ -12,6 +12,7 @@ export default function LeafletMap() {
 
     // Creates markers for nearby stops
     function createMarkers() {
+        console.log(cState.nearby);
         if(cState.nearby !== null) {
             var markers = cState.nearby.map(crime => {
                 return createMarker(crime)
@@ -32,8 +33,10 @@ export default function LeafletMap() {
 
         if (mState.viewport.zoom > 14) {
             return <Marker
-                //key={crime.crime_id}
-                position={[crime.location.coordinates[1], crime.location.coordinates[0]]}
+                position={[crime._id.coordinates[1], crime._id.coordinates[0]]}
+                icon={new L.divIcon({
+                    html: `${svgIconHandler(crime.count)}`
+                })}
                 onClick={() => { onClick() }}
             />
 
