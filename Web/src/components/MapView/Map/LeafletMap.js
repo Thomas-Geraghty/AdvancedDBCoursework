@@ -31,7 +31,7 @@ export default function LeafletMap() {
             bgColor = 'black';
         }
 
-        if (mState.viewport.zoom > 14) {
+        if (mState.viewport.zoom > 10) {
             return <Marker
                 position={[crime._id.coordinates[1], crime._id.coordinates[0]]}
                 icon={new L.divIcon({

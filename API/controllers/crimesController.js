@@ -195,7 +195,9 @@ function getCrimesWithinArea(boundingBox, date) {
             {
                 $group: {
                     _id: "$location",
-                    count: { $sum: 1 }
+                    count: { $sum: 1 },
+                    street_name: { "$first": "$street_name" },
+                    falls_within: { "$first": "$falls_within" }
                 }
             }
         ]
