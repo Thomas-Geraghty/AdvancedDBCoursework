@@ -13,36 +13,33 @@ export default function LeafletMap() {
     // Creates markers for nearby stops
     function createMarkers() {
         if(cState.nearby !== null) {
-            return cState.nearby.map(stop => {
-                return createMarker(stop)
+            var markers = cState.nearby.map(crime => {
+                return createMarker(crime)
             })
+            console.log(markers.length);
+            return markers;
         } else {
             return null;
         }
     }
 
     // Creates marker for stop
-    function createMarker(stop, color, bgColor) {
-        if (stop.atco === cState.activeStopID) {
+    function createMarker(crime, color, bgColor) {
+        if (crime.atco === cState.activeStopID) {
             color = 'orange';
             bgColor = 'black';
         }
 
         if (mState.viewport.zoom > 14) {
             return <Marker
-                key={stop.atco}
-                atco={stop.atco}
-                position={[stop.lat, stop.lon]}
-                icon={new L.divIcon({
-                    html: `${svgIconHandler(stop.type, color, bgColor)}`,
-                    className: stop.atco === cState.activeStopID ? 'active' : null
-                })}
+                //key={crime.crime_id}
+                position={[crime.location.coordinates[1], crime.location.coordinates[0]]}
                 onClick={() => { onClick() }}
             />
 
             function onClick() {
-                if (stop.atco !== cState.activeStopID) {
-                    cDispatch({ type: 'SET_ACTIVE_STOP_ID', payload: stop.atco })
+                if (crime.atco !== cState.activeStopID) {
+                    cDispatch({ type: 'SET_ACTIVE_STOP_ID', payload: crime.atco })
                 } else {
                     cDispatch({ type: 'RESET' })
                 }

@@ -27,7 +27,7 @@ export default ({ children }) => {
   // Get Nearby Crime Data
   useEffect(() => {
     if (mState.viewport) {
-      getNearbyCrimes(mState.viewport.center, Math.pow((20 - mState.viewport.zoom), 2.5) * 30)
+      getNearbyCrimes(mState.viewport.center, 100)
         .then(result => {
           cDispatch({ type: 'SET_NEARBY', payload: result })
         });
