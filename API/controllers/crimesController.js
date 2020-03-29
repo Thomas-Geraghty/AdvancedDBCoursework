@@ -162,7 +162,7 @@ function getCrimesWithinArea(boundingBox, date) {
     var height_meters = height * 111320
     var width_meters = width * ((4007500 * Math.cos(height * (Math.PI / 180))) / (2 * Math.PI))
 
-    var radius = Math.min(height_meters, width_meters) / 2
+    var radius = Math.min(height_meters, width_meters) / 1.5
 
     var location = {
         lat: boundingBox.SW[0] + Math.abs((boundingBox.NE[0] - boundingBox.SW[0]) / 2),
@@ -198,7 +198,7 @@ function getCrimesWithinArea(boundingBox, date) {
                     count: { $sum: 1 }
                 }
             }
-         ]
+        ]
 
     return mongodb.getAggregate('crimes', aggregation);
 }
