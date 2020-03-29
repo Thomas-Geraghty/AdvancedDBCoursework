@@ -148,6 +148,50 @@ function getCrimesNearby2(location, distance, date) {
     return mongodb.getAggregate('crimes', aggregation);
 }
 
+function getCrimesWithinArea(location, boundingBox, date) {
+    // boundingBox = [ latitude, longitude ]
+    var height = Math.abs(parseFloat(boundingBox.NE[0]) - parseFloat(boundingBox.SW[0]))
+    var width = Math.abs(parseFloat(boundingBox.NE[1]) - parseFloat(boundingBox.SW[1]))
+
+    var height_meters = height * 111320
+    var width_meters = width * ((4007500 * Math.cos(height * (Math.PI / 180))) / (2 * Math.PI))
+
+    var radius = Math.min(height_meters, width_meters) / 2
+
+    const aggregation =
+        [
+            {
+                $geoNear: {
+                    near: { type: "Point", coordinates: [ location.lon, location.lat ] },
+                    distanceField: "distance",
+                    maxDistance: radius
+                }
+            },
+            {
+                $project: {
+                    date: { $toDate: { $dateFromString: { dateString: "$month" } } },
+                    location: 1, last_outcome_category: 1, falls_within: 1, street_name: 1, crime_type: 1
+                }
+            },
+            {
+                $match: {
+                    date: {
+                        $gte: date,
+                        $lt: new Date()
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$location",
+                    count: { $sum: 1 }
+                }
+            }
+         ]
+
+    return mongodb.getAggregate('crimes', aggregation);
+}
+
 function getCrimesByType(type) {
     return mongodb.getRecords('crimes', { query: { crime_type: type } });
 }
@@ -205,6 +249,7 @@ module.exports = {
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,
     getCrimesNearby2: getCrimesNearby2,
+    getCrimesWithinArea: getCrimesWithinArea,
     getCrimesByType: getCrimesByType,
     getCrimesByRegion: getCrimesByRegion,
     getSearchResults: getSearchResults,
