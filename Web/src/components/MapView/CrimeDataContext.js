@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import { MainContext } from './MainContext'
-import { getCrimesWithinArea } from '../../client/API';
+import { getCrimesWithinArea, getCrimeTypes } from '../../client/API';
 
 export const CrimeDataContext = React.createContext();
 
 const initialState = {
-  nearby: []
+  nearby: [],
+  crime_types: []
 };
 
 const reducer = (state, action) => {
@@ -17,6 +18,8 @@ const reducer = (state, action) => {
       return reset;
     case 'SET_NEARBY':
       return { ...state, nearby: action.payload };
+    case 'SET_CRIME_TYPES':
+      return { ...state, crime_types: action.payload };
     default:
       break
   }
@@ -35,6 +38,14 @@ export default ({ children }) => {
         });
     }
   }, [mState.viewbounds])
+
+  // Get crime types
+  useEffect(() => {
+    getCrimeTypes()
+      .then(result => {
+        cDispatch({ type: 'SET_CRIME_TYPES', payload: result })
+      });
+  }, [])
 
   const CrimeData = { cState, cDispatch }
 

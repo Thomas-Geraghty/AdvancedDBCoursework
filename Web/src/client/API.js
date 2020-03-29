@@ -1,6 +1,17 @@
 var protocol = "https://";
 var url = '192.168.0.80:8443';
 
+export function getCrimeTypes() {
+    var path = `/api/crimes/types`
+    var requestURL = protocol + url + path;
+
+    return new Promise((resolve) => {
+        get(requestURL).then((response) => {
+            resolve(response);
+        })
+    })
+}
+
 // Takes coordinates and distance (radius) around coord and gets all crimes
 export function getNearbyCrimes(coords, radius) {
     var path = `/api/crimes/nearby?lat=${coords[0]}&lon=${coords[1]}&dist=${radius}`

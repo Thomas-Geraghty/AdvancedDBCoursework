@@ -1,9 +1,14 @@
 import React from "react";
 import "./MapSettings.scss";
-import { MainContext } from '../MainContext';
+import { CrimeDataContext } from '../CrimeDataContext';
 
 export default function MapSearch() {
     const [ active, setActive ] = React.useState(false);
+    const { cState, cDispatch } = React.useContext(CrimeDataContext);
+
+    const crime_options = cState.crime_types.map(type => {
+        return <option value={type}>{type}</option>
+    })
 
     // Render
     return (
@@ -22,14 +27,7 @@ export default function MapSearch() {
                 <div className="map-settings__crime-selector">
                     <h4>Crime Type</h4>
                     <select>
-                        <option value="volvo">Volvo</option>
-                        <option value="saab">Saab</option>
-                        <option value="fiat">Fiat</option>
-                        <option value="audi">Audi</option>
-                        <option value="volvo">Volvo</option>
-                        <option value="saab">Saab</option>
-                        <option value="fiat">Fiat</option>
-                        <option value="audi">Audi</option>
+                        {crime_options}
                     </select>
                 </div>
             </div>
