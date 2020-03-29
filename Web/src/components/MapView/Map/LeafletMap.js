@@ -52,14 +52,16 @@ export default function LeafletMap() {
 
     // Render
     return (
-        console.log("render"),
         <Map
             viewport={mState.viewport}
             ref={map}
             onViewportChanged={(newviewport) => { 
                 mDispatch({ type: 'SET_VIEWPORT', payload: newviewport });
+                mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() });
             }}
             onClick={() => { cDispatch({ type: 'RESET' }) }}
+            onload={() => { mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() })}}
+            on
         >
             <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
             {createMarkers()}

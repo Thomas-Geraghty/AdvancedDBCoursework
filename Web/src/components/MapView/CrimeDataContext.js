@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { MainContext } from './MainContext'
-import { getNearbyCrimes } from '../../client/API';
+import { getCrimesWithinArea } from '../../client/API';
 
 export const CrimeDataContext = React.createContext();
 
@@ -29,12 +29,12 @@ export default ({ children }) => {
   // Get Nearby Crime Data
   useEffect(() => {
     if (mState.viewbounds) {
-      getNearbyCrimes(mState.viewport.center, 100)
+      getCrimesWithinArea(mState.viewbounds)
         .then(result => {
           cDispatch({ type: 'SET_NEARBY', payload: result })
         });
     }
-  }, [mState.viewport])
+  }, [mState.viewbounds])
 
   const CrimeData = { cState, cDispatch }
 

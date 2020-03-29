@@ -13,6 +13,18 @@ export function getNearbyCrimes(coords, radius) {
     })
 }
 
+export function getCrimesWithinArea(boundingBox) {
+    var path = `/api/crimes/within-area`
+    var query = `?ne=${boundingBox._northEast.lat},${boundingBox._northEast.lng}&sw=${boundingBox._southWest.lat},${boundingBox._southWest.lng}`
+
+    var requestURL = protocol+ url + path + query;
+
+    return new Promise((resolve) => {
+        get(requestURL).then((response) => {
+            resolve(response);
+        })
+    })
+}
 
 // Sends get request to API server and handles response.
 function get(url) {

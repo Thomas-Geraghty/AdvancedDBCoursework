@@ -2,6 +2,8 @@ import React, { useEffect } from 'react'
 
 export const MainContext = React.createContext()
 
+var userLoc = [];
+
 const initialState = {
     viewport: null,
     viewbounds: null,
@@ -9,7 +11,6 @@ const initialState = {
 };
 
 const reducer = (state, action) => {
-    console.log(action.type)
 
     switch (action.type) {
         case 'SET_VIEWPORT':
@@ -23,7 +24,9 @@ const reducer = (state, action) => {
             }
             break;
         case 'SET_VIEWBOUNDS':
-            return { ...state, location: action.payload };
+            return { ...state, viewbounds: action.payload };
+        case 'GET_USER_LOCATION':
+            return userLoc;
         default:
             break;
     }
@@ -36,7 +39,7 @@ export default ({ children }) => {
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
-                mDispatch({ type: 'SET_LOCATION', payload: [position.coords.latitude, position.coords.longitude] })
+                userLoc = [position.coords.latitude, position.coords.longitude];
                 if (mState.viewport === null) {
                     mDispatch({ type: 'SET_VIEWPORT', payload: { center: [position.coords.latitude, position.coords.longitude], zoom: 16 } })
                 }
