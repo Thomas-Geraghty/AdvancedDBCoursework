@@ -114,24 +114,52 @@ function getCrimesNearby(location, distance) {
 }
 
 function getCrimesNearby2(location, distance) {
-    const aggregation = 
+    const aggregation =
         [
             {
-              $geoNear: {
-                 near: { type: "Point", coordinates: [ location.lon, location.lat ] },
-                 distanceField: "distance",
-                 maxDistance: distance
-              }
+                $geoNear: {
+                    near: { type: "Point", coordinates: [ location.lon, location.lat ] },
+                    distanceField: "distance",
+                    maxDistance: distance
+                }
             },
-            { $group: {
-             _id: "$location",
-                 count: {$sum:1}
-              }
+            {
+                $group: {
+                    _id: "$location",
+                    count: { $sum: 1 }
+                }
             },
             { $limit : 1000 }
          ]
 
-    return mongodb.getAggregate('crimes', aggregation );
+    return mongodb.getAggregate('crimes', aggregation);
+}
+
+function getCrimesNearbyWithinDate(location, distance, date) {
+    const aggregation = [
+        {
+            $geoNear: {
+                near: { type: "Point", coordinates: [ location.lon, location.lat ] },
+                distanceField: "distance",
+                maxDistance: distance
+            }
+        },
+        {
+            $project: {
+                date: { $toDate: { $dateFromString: { dateString: "$month" } } },
+                location: 1, last_outcome_category: 1, falls_within: 1, street_name: 1, crime_type: 1
+            }
+        },
+        {
+            $match: {
+                date: {
+                    $gte: date,
+                    $lt: new Date()
+                }
+            }
+        }
+    ]
+    return mongodb.getAggregate('crimes', aggregation);
 }
 
 function getCrimesByType(type) {
@@ -191,6 +219,7 @@ module.exports = {
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,
     getCrimesNearby2: getCrimesNearby2,
+    getCrimesNearbyWithinDate: getCrimesNearbyWithinDate,
     getCrimesByType: getCrimesByType,
     getCrimesByRegion: getCrimesByRegion,
     getSearchResults: getSearchResults,

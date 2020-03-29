@@ -45,6 +45,30 @@ function routes() {
     })
   });
 
+  app.get('/api/crimes/nearby-within', (req, res) => {
+    const location = {
+      lat: parseFloat(req.query.lat),
+      lon: parseFloat(req.query.lon)
+    }
+    const distance = parseFloat(req.query.dist);
+    var date;
+    if (req.query.date) {
+      date = new Date(req.query.date)
+    } else {
+      date = new Date()
+      date.setMonth(date.getMonth() - 3)
+    }
+
+    console.log(date)
+
+    crimesController.getCrimesNearbyWithinDate(location, distance, date)
+    .then(result => {
+      res.json(result);
+    })
+  });
+
+
+
   app.get('/api/crimes/heatmap', (req, res) => {
     let boundingBox = {
       NE: req.query.ne.split(','),
