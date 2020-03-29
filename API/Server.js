@@ -59,12 +59,15 @@ function routes() {
     })
   });
 
-  app.get('/api/crimes/nearby-within', (req, res) => {
+  app.get('/api/crimes/within-area', (req, res) => {
     const location = {
       lat: parseFloat(req.query.lat),
       lon: parseFloat(req.query.lon)
     }
-    const distance = parseFloat(req.query.dist);
+    const boundingBox = {
+      NE: req.query.ne.split(','),
+      SW: req.query.sw.split(',')
+    }
     var date;
     if (req.query.date) {
       date = new Date(req.query.date)
@@ -73,9 +76,7 @@ function routes() {
       date.setMonth(date.getMonth() - 3)
     }
 
-    console.log(date)
-
-    crimesController.getCrimesNearbyWithinDate(location, distance, date)
+    crimesController.getCrimesWithinArea(location, boundingBox, date)
     .then(result => {
       res.json(result);
     })
