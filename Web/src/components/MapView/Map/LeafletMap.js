@@ -6,6 +6,7 @@ import { CrimeDataContext } from '../CrimeDataContext';
 import { svgIconHandler } from '../../../client/Base64icons';
 import './LeafletMap.scss'
 
+
 export default function LeafletMap() {
     const { mState, mDispatch } = React.useContext(MainContext);
     const { cState, cDispatch } = React.useContext(CrimeDataContext);
