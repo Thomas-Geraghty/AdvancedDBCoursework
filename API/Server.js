@@ -74,6 +74,24 @@ function routes() {
 
     crimesController.getCrimesWithinArea(boundingBox, date)
     .then(result => {
+      var min = 1000;
+      var max = 0;
+
+      result.forEach(point => {
+        count = point.count
+        if (count < min) {
+          min = count;
+        }
+        if (count > max) {
+          max = count
+        }
+      })
+
+      result.map(p => {
+        p.distribution_point = (min / max) * p.count * 100
+        return p
+      })
+
       res.json(result);
     })
   });
