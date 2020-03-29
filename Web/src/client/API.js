@@ -1,5 +1,5 @@
-var protocol = "http://";
-var url = 'localhost:8080';
+var protocol = "https://";
+var url = 'localhost:8443';
 
 // Takes coordinates and distance (radius) around coord and gets all crimes
 export function getNearbyCrimes(coords, radius) {
