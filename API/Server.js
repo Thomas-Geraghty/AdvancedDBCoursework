@@ -60,10 +60,6 @@ function routes() {
   });
 
   app.get('/api/crimes/within-area', (req, res) => {
-    const location = {
-      lat: parseFloat(req.query.lat),
-      lon: parseFloat(req.query.lon)
-    }
     const boundingBox = {
       NE: req.query.ne.split(','),
       SW: req.query.sw.split(',')
@@ -76,7 +72,7 @@ function routes() {
       date.setMonth(date.getMonth() - 3)
     }
 
-    crimesController.getCrimesWithinArea(location, boundingBox, date)
+    crimesController.getCrimesWithinArea(boundingBox, date)
     .then(result => {
       res.json(result);
     })

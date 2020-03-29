@@ -148,15 +148,26 @@ function getCrimesNearby2(location, distance, date) {
     return mongodb.getAggregate('crimes', aggregation);
 }
 
-function getCrimesWithinArea(location, boundingBox, date) {
+function getCrimesWithinArea(boundingBox, date) {
     // boundingBox = [ latitude, longitude ]
-    var height = Math.abs(parseFloat(boundingBox.NE[0]) - parseFloat(boundingBox.SW[0]))
-    var width = Math.abs(parseFloat(boundingBox.NE[1]) - parseFloat(boundingBox.SW[1]))
+
+    boundingBox = {
+        NE: [ parseFloat(boundingBox.NE[0]), parseFloat(boundingBox.NE[1])],
+        SW: [ parseFloat(boundingBox.SW[0]), parseFloat(boundingBox.SW[1])]
+    }
+
+    var height = Math.abs(boundingBox.NE[0] - boundingBox.SW[0])
+    var width = Math.abs(boundingBox.NE[1] - boundingBox.SW[1])
 
     var height_meters = height * 111320
     var width_meters = width * ((4007500 * Math.cos(height * (Math.PI / 180))) / (2 * Math.PI))
 
     var radius = Math.min(height_meters, width_meters) / 2
+
+    var location = {
+        lat: boundingBox.SW[0] + Math.abs(boundingBox.NE[0] - boundingBox.SW[0]),
+        lon: boundingBox.SW[1] + Math.abs(boundingBox.NE[1] - boundingBox.SW[1])
+    }
 
     const aggregation =
         [
