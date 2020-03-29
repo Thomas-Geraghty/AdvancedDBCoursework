@@ -1,6 +1,6 @@
 import React from 'react';
 import L from 'leaflet';
-import { Map, TileLayer, Marker } from 'react-leaflet'
+import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import { MainContext } from '../MainContext';
 import { CrimeDataContext } from '../CrimeDataContext';
 import { svgIconHandler } from '../../../client/Base64icons';
@@ -38,7 +38,16 @@ export default function LeafletMap() {
                     html: `${svgIconHandler(crime.count, crime.distribution_point)}`
                 })}
                 onClick={() => { onClick() }}
-            />
+            >
+                <Popup>
+                    Crime count: {crime.count}
+                    <br />
+                    Handled by: {crime.falls_within}.
+                    <br />
+                    Location: {crime.street_name}.
+                    <br />
+                    </Popup>
+            </Marker>
 
             function onClick() {
                 if (crime.atco !== cState.activeStopID) {
