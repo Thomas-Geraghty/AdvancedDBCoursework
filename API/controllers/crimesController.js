@@ -28,6 +28,7 @@ function intialize() {
     return new Promise((resolve) => {
         mongodb.intialize()
         .then(() => {
+            /*
             var promises = [
                 new Promise((resolve) => {
                     mongodb.getDistinct('crimes', { query: "crime_type", fields: { crime_type: 1 } })
@@ -60,6 +61,8 @@ function intialize() {
             Promise.all(promises).then(() => {
                 resolve();
             })
+            */
+           resolve();
         });
     })
 }
@@ -93,7 +96,28 @@ function getCrimesNearby(location, distance) {
         }
     }
 
-    return mongodb.getRecords('crimes', { query: query });
+    return mongodb.getRecords('crimes', { query: query, limit: 1000 });
+}
+
+function getCrimesNearby2(location, distance) {
+    const aggregation = 
+        [
+            {
+              $geoNear: {
+                 near: { type: "Point", coordinates: [ location.lon, location.lat ] },
+                 distanceField: "distance",
+                 maxDistance: distance
+              }
+            },
+            { $group: {
+             _id: "$location",
+                 count: {$sum:1}
+              }
+            },
+            { $limit : 1000 }
+         ]
+
+    return mongodb.getAggregate('crimes', aggregation );
 }
 
 function getCrimesByType(type) {
@@ -152,6 +176,7 @@ module.exports = {
 
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,
+    getCrimesNearby2: getCrimesNearby2,
     getCrimesByType: getCrimesByType,
     getCrimesByRegion: getCrimesByRegion,
     getSearchResults: getSearchResults,
