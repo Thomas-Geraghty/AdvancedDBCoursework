@@ -113,25 +113,39 @@ function getCrimesNearby(location, distance) {
     return mongodb.getRecords('crimes', { query: query, limit: 1000 });
 }
 
-function getCrimesNearby2(location, distance) {
-    const aggregation = 
+function getCrimesNearby2(location, distance, date) {
+    const aggregation =
         [
             {
-              $geoNear: {
-                 near: { type: "Point", coordinates: [ location.lon, location.lat ] },
-                 distanceField: "distance",
-                 maxDistance: distance
-              }
+                $geoNear: {
+                    near: { type: "Point", coordinates: [ location.lon, location.lat ] },
+                    distanceField: "distance",
+                    maxDistance: distance
+                }
             },
-            { $group: {
-             _id: "$location",
-                 count: {$sum:1}
-              }
+            {
+                $project: {
+                    date: { $toDate: { $dateFromString: { dateString: "$month" } } },
+                    location: 1, last_outcome_category: 1, falls_within: 1, street_name: 1, crime_type: 1
+                }
             },
-            { $limit : 1000 }
+            {
+                $match: {
+                    date: {
+                        $gte: date,
+                        $lt: new Date()
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$location",
+                    count: { $sum: 1 }
+                }
+            }
          ]
 
-    return mongodb.getAggregate('crimes', aggregation );
+    return mongodb.getAggregate('crimes', aggregation);
 }
 
 function getCrimesByType(type) {
