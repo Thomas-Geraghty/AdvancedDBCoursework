@@ -249,6 +249,7 @@ module.exports = {
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,
     getCrimesNearby2: getCrimesNearby2,
+    getCrimesWithinArea: getCrimesWithinArea,
     getCrimesByType: getCrimesByType,
     getCrimesByRegion: getCrimesByRegion,
     getSearchResults: getSearchResults,
