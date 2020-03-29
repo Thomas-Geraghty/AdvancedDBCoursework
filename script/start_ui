@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cd Web && npm start
+cd Web && HTTPS=true yarn start
