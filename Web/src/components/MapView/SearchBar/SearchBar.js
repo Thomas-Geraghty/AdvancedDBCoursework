@@ -60,23 +60,12 @@ export default function MapSearch() {
         }
     }
 
-    function onSwitch(e) {
-        let field1 = e.target.parentNode.input_origin.value;
-        let field2 = e.target.parentNode.input_destination.value;
-
-        e.target.parentNode.input_origin.value = field2;
-        e.target.parentNode.input_destination.value = field1;
-    }
-
     // Render
     return (
         <div className="search-bar">
             <form className="form" onSubmit={onSubmit}>
                 <input className="search-bar__input" type="text" name='input_origin' autoComplete="off" placeholder="Address, town or service..." onChange={onInput}></input>
                 <button className="button button--square button--color-1" type="submit"><i className="fa fa-search"></i></button>
-
-                <input className="search-bar__input search-bar__input--slide" type="text" name='input_destination' autoComplete="off" placeholder="Address, town or service..." onChange={onInput}></input>
-                <button className="button button--square button--color-1 search-bar__button--slide" type="button" onClick={onSwitch}><i className="fa fa-arrows-v"></i></button>
                 <ul className="search-bar__input--autocomplete">{autocomplete}</ul>
             </form>
         </div>

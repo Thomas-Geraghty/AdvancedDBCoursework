@@ -1,0 +1,37 @@
+@import '../../../styles/utilities/Colors.scss';
+
+$form-width: 2.5rem;
+
+.map-settings {
+    position: fixed;
+    left: 0;
+    bottom: 4rem;
+    margin: 1rem;
+    width: $form-width;
+    z-index: 2000;
+    height: 2.5rem;
+    transition: all 0.1s ease-in-out;
+
+    &__slide-out {
+        display: none;
+        height: 7.5rem;
+        width: 20rem;
+        background-color: white;
+        padding: 1rem;
+    }
+
+    &__date-selector {
+        margin-bottom: 0.5rem;
+        p {
+            display: inline;
+            margin: 0 0.5rem;
+        }
+    }
+
+    &.active {
+        & .map-settings__slide-out {
+            display: block;
+            transform: translateY(-12rem);
+        }
+    }
+}
