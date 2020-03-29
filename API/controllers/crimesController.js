@@ -165,8 +165,8 @@ function getCrimesWithinArea(boundingBox, date) {
     var radius = Math.min(height_meters, width_meters) / 2
 
     var location = {
-        lat: boundingBox.SW[0] + Math.abs(boundingBox.NE[0] - boundingBox.SW[0]),
-        lon: boundingBox.SW[1] + Math.abs(boundingBox.NE[1] - boundingBox.SW[1])
+        lat: boundingBox.SW[0] + Math.abs((boundingBox.NE[0] - boundingBox.SW[0]) / 2),
+        lon: boundingBox.SW[1] + Math.abs((boundingBox.NE[1] - boundingBox.SW[1]) / 2)
     }
 
     const aggregation =
