@@ -2,7 +2,7 @@ const mongodb = require('../data/mongodb')
 
 var crimeTypes = [
     "Anti-social behaviour", "Bicycle theft", "Burglary", "Criminal damage and arson",
-    "Drugs", "Other crime", "Other theft", "Possession of weapons", "Public order", 
+    "Drugs", "Other crime", "Other theft", "Possession of weapons", "Public order",
     "Robbery", "Shoplifting", "Theft from the person", "Vehicle crime",
 ];
 var regions = [
@@ -22,7 +22,21 @@ var regions = [
     "Thames Valley Police", "Warwickshire Police", "West Mercia Police",
     "West Midlands Police", "West Yorkshire Police", "Wiltshire Police"
 ];
-var outcomes = [];
+var outcomes = [
+    "Investigation complete; no suspect identified", "", "Status update unavailable",
+    "Further investigation is not in the public interest", "Offender given a caution",
+    "Unable to prosecute suspect", "Offender given a drugs possession warning",
+    "Court result unavailable", "Court case unable to proceed",
+    "Offender given community sentence", "Offender given suspended prison sentence",
+    "Formal action is not in the public interest", "Local resolution",
+    "Offender given conditional discharge", "Offender sent to prison",
+    "Offender ordered to pay compensation", "Offender given penalty notice",
+    "Offender fined", "Awaiting court outcome", "Suspect charged as part of another case",
+    "Defendant found not guilty", "Action to be taken by another organisation",
+    "Offender otherwise dealt with", "Offender deprived of property",
+    "Defendant sent to Crown Court", "Offender given absolute discharge",
+    "Further action is not in the public interest", "Under investigation"
+];
 
 function intialize() {
     return new Promise((resolve) => {
