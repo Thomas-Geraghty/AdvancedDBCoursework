@@ -45,8 +45,15 @@ function routes() {
       lon: parseFloat(req.query.lon)
     }
     const distance = parseFloat(req.query.dist);
+    var date;
+    if (req.query.date) {
+      date = new Date(req.query.date)
+    } else {
+      date = new Date()
+      date.setMonth(date.getMonth() - 3)
+    }
 
-    crimesController.getCrimesNearby2(location, distance)
+    crimesController.getCrimesNearby2(location, distance, date)
     .then(result => {
       res.json(result);
     })
