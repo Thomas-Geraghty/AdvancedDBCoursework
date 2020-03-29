@@ -17,11 +17,13 @@ const reducer = (state, action) => {
       return reset;
     case 'SET_NEARBY':
       return { ...state, nearby: action.payload };
+    default:
+      break
   }
 };
 
 export default ({ children }) => {
-  const [ cState, cDispatch ] = React.useReducer(reducer, initialState)
+  const [cState, cDispatch] = React.useReducer(reducer, initialState)
   const { mState } = React.useContext(MainContext);
 
   // Get Nearby Crime Data

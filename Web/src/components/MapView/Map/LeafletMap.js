@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import L from 'leaflet';
 import { Map, TileLayer, Marker } from 'react-leaflet'
 import { MainContext } from '../MainContext';
@@ -51,6 +51,7 @@ export default function LeafletMap() {
 
     // Render
     return (
+        console.log("render"),
         <Map
             viewport={mState.viewport}
             ref={map}
