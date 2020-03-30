@@ -13,7 +13,8 @@ const reducer = (state, action) => {
   switch (action.type) {
     case 'RESET':
       let reset = {
-        nearby: state.nearby
+        nearby: state.nearby,
+        crime_types: state.crime_types
       };
       return reset;
     case 'SET_NEARBY':
