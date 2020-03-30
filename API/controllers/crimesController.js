@@ -93,27 +93,58 @@ function getOutcomes() {
     return outcomes;
 }
 
+function generateStats() {
+    function getCrimesWithAnOutcome() {
+        const aggregation =
+            [
+                {
+                    $project: {
+                        crime_type: 1,
+                        has_outcome: {
+                            $cond: { if: { $ne: ["$last_outcome_category", ""] }, then: 1, else: 0 }
+                        },
+                        no_outcome: {
+                            $cond: { if: { $eq: ["$last_outcome_category", ""] }, then: 1, else: 0 }
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$crime_type",
+                        with_outcome: { $sum: "$has_outcome" },
+                        without_outcome: { $sum: "$no_outcome" }
+                    }
+                }
+            ]
+
+        return mongodb.getAggregate('crimes', aggregation);
+    }
+
+    function getCrimesByTypeCount(type) {
+        const aggregation = [ {"$group" : {_id: "$crime_type", count:{$sum:1}}} ]
+        return mongodb.getAggregate('crimes', aggregation );
+    }
+
+    function getCrimesByRegionCount(type) {
+        const aggregation = [ {"$group" : {_id: "$falls_within", count:{$sum:1}}} ]
+        return mongodb.getAggregate('crimes', aggregation );
+    }
+
+    function getCrimesByMonthCount(type) {
+        const aggregation = [ {"$group" : {_id: "$month", count:{$sum:1}}} ]
+        return mongodb.getAggregate('crimes', aggregation );
+    }
+}
+
+function getStats() {
+
+}
+
 function getCrimes(index, limit) {
     return mongodb.getRecords('crimes', { index: index, limit: limit });
 }
 
-function getCrimesNearby(location, distance) {
-    const query = {
-        location: {
-            $nearSphere: {
-                $geometry: {
-                    type: "Point",
-                    coordinates: [location.lon, location.lat]
-                },
-                $maxDistance: distance
-            }
-        }
-    }
-
-    return mongodb.getRecords('crimes', { query: query, limit: 1000 });
-}
-
-function getCrimesNearby2(location, distance, date) {
+function getCrimesNearby(location, distance, date) {
     const aggregation =
         [
             {
@@ -205,78 +236,12 @@ function getCrimesWithinArea(boundingBox, date) {
     return mongodb.getAggregate('crimes', aggregation);
 }
 
-function getCrimesWithAnOutcome() {
-    const aggregation =
-        [
-            {
-                $project: {
-                    crime_type: 1,
-                    has_outcome: {
-                        $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                    },
-                    no_outcome: {
-                        $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: "$crime_type",
-                    with_outcome: { $sum: "$has_outcome" },
-                    without_outcome: { $sum: "$no_outcome" }
-                }
-            }
-         ]
-
-    return mongodb.getAggregate('crimes', aggregation);
-}
-
-function getCrimesByType(type) {
-    return mongodb.getRecords('crimes', { query: { crime_type: type } });
-}
-
 function getCrimesByRegion(region, index, limit) {
     return mongodb.getRecords('crimes', { query: { crime_type: region }, index: index, limit: limit });
 }
 
 function getSearchResults(query) {
     return mongodb.getRecords('crimes', { query: { $text: { $search: query } } });
-}
-
-function getHeatmap(boundingBox, divisions) {
-    divisions = 3;
-
-    //MAKE REQUEST TO DB FOR INTERSECTS BETWEEN THESE
-    const crimes = [];
-    const crimesRegions = [];
-
-    console.log(boundingBox)
-    let length = Math.abs(boundingBox.NE[0] - boundingBox.SW[0]) / divisions;
-
-    for(lat = boundingBox.NE[0]; lat > boundingBox.SW[0]; lat -= length) {
-        for(lon = boundingBox.NE[1]; lon > boundingBox.SW[1]; lon -= length) {
-            console.log(lon)
-            let b = {
-                boundingBox: {
-                    NE: [lat + length/2, lon - length/2],
-                    SW: [lat - length/2, lon + length/2]
-                },
-                intensity: 0
-            };
-
-            for(crime in crimes) {
-                if((crime.lat > lat - length/2 && crime.lat < lat + length/2)
-                && (crime.lon > lon - length/2 && crime.lon < lon + length/2)) {
-                    b.intensity++;
-                }
-            }
-
-            crimesRegions.push(b);
-        }
-    }
-
-
-    return crimesRegions;
 }
 
 module.exports = {

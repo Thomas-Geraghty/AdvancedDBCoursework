@@ -53,7 +53,7 @@ function routes() {
       date.setMonth(date.getMonth() - 3)
     }
 
-    crimesController.getCrimesNearby2(location, distance, date)
+    crimesController.getCrimesNearby(location, distance, date)
     .then(result => {
       res.json(result);
     })
@@ -96,15 +96,6 @@ function routes() {
     })
   });
 
-  app.get('/api/crimes/heatmap', (req, res) => {
-    let boundingBox = {
-      NE: req.query.ne.split(','),
-      SW: req.query.sw.split(',')
-    }
-
-    crimesController.getHeatmap(boundingBox);
-  });
-
   app.get('/api/crimes/with-outcomes', (req, res) => {
     crimesController.getCrimesWithAnOutcome()
     .then(result => {
@@ -125,13 +116,5 @@ function routes() {
   });
 }
 
-// var httpServer = http.createServer(app)
 var httpsServer = https.createServer(credentials, app)
-
-// httpServer.listen(config.server.http_port, config.server.host)
 httpsServer.listen(config.server.https_port, config.server.host)
-
-// var server = app.listen(config.server.port, config.server.host, () => {
-//   var host = server.address().address
-//   var port = server.address().port
-// })
