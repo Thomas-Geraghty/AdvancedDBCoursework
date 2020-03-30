@@ -38,6 +38,8 @@ var outcomes = [
     "Further action is not in the public interest", "Under investigation"
 ];
 
+var stats;
+
 function intialize() {
     return new Promise((resolve) => {
         mongodb.intialize()
@@ -76,7 +78,10 @@ function intialize() {
                 resolve();
             })
             */
-           resolve();
+            generateStats().then(() => {
+                console.log(stats);
+                resolve();
+            });
         });
     })
 }
@@ -94,6 +99,7 @@ function getOutcomes() {
 }
 
 function generateStats() {
+    
     function getCrimesWithAnOutcome() {
         const aggregation =
             [
@@ -120,24 +126,52 @@ function generateStats() {
         return mongodb.getAggregate('crimes', aggregation);
     }
 
-    function getCrimesByTypeCount(type) {
-        const aggregation = [ {"$group" : {_id: "$crime_type", count:{$sum:1}}} ]
+    function getCrimesByTypeCount() {
+        const aggregation = [
+            {
+                $project: {
+                    crime_type: 1,
+                }
+            },
+            {
+                "$group": { _id: "$crime_type", count: { $sum: 1 } }
+            }
+        ]
         return mongodb.getAggregate('crimes', aggregation );
     }
 
-    function getCrimesByRegionCount(type) {
+    function getCrimesByRegionCount() {
         const aggregation = [ {"$group" : {_id: "$falls_within", count:{$sum:1}}} ]
         return mongodb.getAggregate('crimes', aggregation );
     }
 
-    function getCrimesByMonthCount(type) {
+    function getCrimesByMonthCount() {
         const aggregation = [ {"$group" : {_id: "$month", count:{$sum:1}}} ]
         return mongodb.getAggregate('crimes', aggregation );
     }
+
+    var promises = [
+        getCrimesWithAnOutcome(),
+        getCrimesByTypeCount(),
+        getCrimesByRegionCount(),
+        getCrimesByMonthCount()
+    ]
+
+    return new Promise((resolve) => {
+        Promise.all(promises).then(results => {
+            stats = {
+                outcomesByHas: results[0],
+                crimesByType: results[1],
+                crimesByRegion: results[2],
+                crimesByMonth: results[3],
+            }
+            resolve()
+        })
+    })
 }
 
 function getStats() {
-
+    return stats;
 }
 
 function getCrimes(index, limit) {
@@ -252,11 +286,7 @@ module.exports = {
 
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,
-    getCrimesNearby2: getCrimesNearby2,
     getCrimesWithinArea: getCrimesWithinArea,
-    getCrimesWithAnOutcome: getCrimesWithAnOutcome,
-    getCrimesByType: getCrimesByType,
     getCrimesByRegion: getCrimesByRegion,
     getSearchResults: getSearchResults,
-    getHeatmap: getHeatmap
 }
