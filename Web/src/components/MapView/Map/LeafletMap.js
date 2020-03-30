@@ -1,14 +1,14 @@
 import React from 'react';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
-import { MainContext } from '../MainContext';
+import { MapContext } from '../MapContext';
 import { CrimeDataContext } from '../CrimeDataContext';
 import { svgIconHandler } from '../../../client/Base64icons';
 import './LeafletMap.scss'
 
 
 export default function LeafletMap() {
-    const { mState, mDispatch } = React.useContext(MainContext);
+    const { mState, mDispatch } = React.useContext(MapContext);
     const { cState, cDispatch } = React.useContext(CrimeDataContext);
     const map = React.useRef();
 
@@ -70,7 +70,6 @@ export default function LeafletMap() {
             }}
             onClick={() => { cDispatch({ type: 'RESET' }) }}
             onload={() => { mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() })}}
-            on
         >
             <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
             {createMarkers()}

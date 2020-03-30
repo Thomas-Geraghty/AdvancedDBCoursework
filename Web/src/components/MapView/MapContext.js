@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-export const MainContext = React.createContext()
+export const MapContext = React.createContext()
 
 var userLoc = [];
 
@@ -49,7 +49,7 @@ export default ({ children }) => {
         }
     }, [])
 
-    const Main = { mState, mDispatch }
+    const Map = { mState, mDispatch }
 
-    return <MainContext.Provider value={Main}>{children}</MainContext.Provider>
+    return <MapContext.Provider value={Map}>{children}</MapContext.Provider>
 }

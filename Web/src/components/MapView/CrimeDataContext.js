@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { MainContext } from './MainContext'
+import { MapContext } from './MapContext'
 import { getCrimesWithinArea, getCrimeTypes } from '../../client/API';
 
 export const CrimeDataContext = React.createContext();
@@ -27,8 +27,8 @@ const reducer = (state, action) => {
 };
 
 export default ({ children }) => {
-  const [cState, cDispatch] = React.useReducer(reducer, initialState)
-  const { mState } = React.useContext(MainContext);
+  const [ cState, cDispatch ] = React.useReducer(reducer, initialState)
+  const { mState } = React.useContext(MapContext);
 
   // Get Nearby Crime Data
   useEffect(() => {

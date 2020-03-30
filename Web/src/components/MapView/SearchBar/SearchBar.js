@@ -1,9 +1,9 @@
 import React from "react";
 import "./SearchBar.scss";
-import { MainContext } from '../MainContext';
+import { MapContext } from '../MapContext';
 
 export default function MapSearch() {
-    const { mDispatch } = React.useContext(MainContext);
+    const { mDispatch } = React.useContext(MapContext);
     const [ autocomplete, setAutocomplete ] = React.useState([]);
 
     function geocoderRequest(value) {
