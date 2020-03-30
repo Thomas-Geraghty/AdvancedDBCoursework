@@ -105,6 +105,13 @@ function routes() {
     crimesController.getHeatmap(boundingBox);
   });
 
+  app.get('/api/crimes/with-outcomes', (req, res) => {
+    crimesController.getCrimesWithAnOutcome()
+    .then(result => {
+      res.json(result)
+    });
+  });
+
   app.get('/api/crimes/regions', (req, res) => {
     res.json(crimesController.getRegions());
   });

@@ -205,6 +205,32 @@ function getCrimesWithinArea(boundingBox, date) {
     return mongodb.getAggregate('crimes', aggregation);
 }
 
+function getCrimesWithAnOutcome() {
+    const aggregation =
+        [
+            {
+                $project: {
+                    crime_type: 1,
+                    has_outcome: {
+                        $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                    },
+                    no_outcome: {
+                        $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$crime_type",
+                    with_outcome: { $sum: "$has_outcome" },
+                    without_outcome: { $sum: "$no_outcome" }
+                }
+            }
+         ]
+
+    return mongodb.getAggregate('crimes', aggregation);
+}
+
 function getCrimesByType(type) {
     return mongodb.getRecords('crimes', { query: { crime_type: type } });
 }
@@ -263,6 +289,7 @@ module.exports = {
     getCrimesNearby: getCrimesNearby,
     getCrimesNearby2: getCrimesNearby2,
     getCrimesWithinArea: getCrimesWithinArea,
+    getCrimesWithAnOutcome: getCrimesWithAnOutcome,
     getCrimesByType: getCrimesByType,
     getCrimesByRegion: getCrimesByRegion,
     getSearchResults: getSearchResults,
