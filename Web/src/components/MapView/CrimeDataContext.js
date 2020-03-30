@@ -32,7 +32,7 @@ export default ({ children }) => {
 
   // Get Nearby Crime Data
   useEffect(() => {
-    if (mState.viewbounds) {
+    if (mState.viewbounds && mState.viewport.zoom > 14) {
       getCrimesWithinArea(mState.viewbounds)
         .then(result => {
           cDispatch({ type: 'SET_NEARBY', payload: result })
