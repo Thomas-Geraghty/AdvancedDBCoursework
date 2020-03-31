@@ -146,6 +146,27 @@ function generateStats() {
         return mongodb.getAggregate('crimes', aggregation);
     }
 
+    function getOutcomeRatio() {
+        const aggregation =
+            [
+                {
+                    $project: {
+                        outcome: {
+                            $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: "No outcome", else: "Has outcome" }
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$outcome",
+                        count: { $sum: 1 }
+                    }
+                }
+            ]
+
+        return mongodb.getAggregate('crimes', aggregation);
+    }
+
     function getCrimesByTypeCount() {
         const aggregation = [
             {
@@ -175,7 +196,8 @@ function generateStats() {
         getRegionsWithOutcomes(),
         getCrimesByTypeCount(),
         getCrimesByRegionCount(),
-        getCrimesByMonthCount()
+        getCrimesByMonthCount(),
+        getOutcomeRatio()
     ]
 
     return new Promise((resolve) => {
@@ -186,6 +208,7 @@ function generateStats() {
                 crimesByType: results[2],
                 crimesByRegion: results[3],
                 crimesByMonth: results[4],
+                outcomeRatio: results[5]
             }
             resolve()
         })
