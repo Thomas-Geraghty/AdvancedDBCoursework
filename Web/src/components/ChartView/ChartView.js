@@ -178,7 +178,7 @@ export default function ChartView() {
                 ]
             }
 
-            return <Bar data={data} options={bar_options} height={doughnutSize * 1.15} width={doughnutSize * 3.5}/>
+            return <Bar data={data} options={bar_options} height={doughnutSize * 1.5} width={doughnutSize * 5}/>
         }
     }
 
@@ -255,12 +255,13 @@ export default function ChartView() {
                     <h4>Crimes by Policing Region</h4>
                     {createCrimesByRegion()}
                 </div>
-            </div>
-            <div className="charts-row">
                 <div>
                     <h4>Outcomes by Crime Type</h4>
                     {createCrimesByOutcome()}
                 </div>
+            </div>
+            <div className="charts-row">
+
                 <div>
                     <h4>Outcomes by Region</h4>
                     {createRegionsByOutcome()}
