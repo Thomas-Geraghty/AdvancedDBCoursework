@@ -1,5 +1,5 @@
 var protocol = "https://";
-var url = '192.168.0.80:8443';
+var url = '127.0.0.1:8443';
 
 export function getCrimeTypes() {
     var path = `/api/crimes/types`
@@ -24,11 +24,24 @@ export function getNearbyCrimes(coords, radius) {
     })
 }
 
+// Takes bounding box and returns crimes within.
 export function getCrimesWithinArea(boundingBox) {
     var path = `/api/crimes/within-area`
     var query = `?ne=${boundingBox._northEast.lat},${boundingBox._northEast.lng}&sw=${boundingBox._southWest.lat},${boundingBox._southWest.lng}`
 
     var requestURL = protocol+ url + path + query;
+
+    return new Promise((resolve) => {
+        get(requestURL).then((response) => {
+            resolve(response);
+        })
+    })
+}
+
+// Gets stats
+export function getCrimeStats(type) {
+    var path = `/api/crimes/stats/${type}`
+    var requestURL = protocol+ url + path;
 
     return new Promise((resolve) => {
         get(requestURL).then((response) => {
