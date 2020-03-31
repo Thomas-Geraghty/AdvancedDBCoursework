@@ -104,21 +104,41 @@ function generateStats() {
         const aggregation =
             [
                 {
-                    $project: {
-                        crime_type: 1,
-                        has_outcome: {
-                            $cond: { if: { $ne: ["$last_outcome_category", ""] }, then: 1, else: 0 }
-                        },
-                        no_outcome: {
-                            $cond: { if: { $eq: ["$last_outcome_category", ""] }, then: 1, else: 0 }
-                        }
-                    }
-                },
-                {
                     $group: {
                         _id: "$crime_type",
-                        with_outcome: { $sum: "$has_outcome" },
-                        without_outcome: { $sum: "$no_outcome" }
+                        with_outcome: {
+                            $sum: {
+                                $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                            }
+                        },
+                        without_outcome: {
+                            $sum: {
+                                $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                            }
+                        }
+                    }
+                }
+            ]
+
+        return mongodb.getAggregate('crimes', aggregation);
+    }
+
+    function getRegionsWithOutcomes() {
+        const aggregation =
+            [
+                {
+                    $group: {
+                        _id: "$falls_within",
+                        with_outcome: {
+                            $sum: {
+                                $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 0, else: 1 }
+                            }
+                        },
+                        without_outcome: {
+                            $sum: {
+                                $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                            }
+                        }
                     }
                 }
             ]
@@ -152,6 +172,7 @@ function generateStats() {
 
     var promises = [
         getCrimesWithAnOutcome(),
+        getRegionsWithOutcomes(),
         getCrimesByTypeCount(),
         getCrimesByRegionCount(),
         getCrimesByMonthCount()
@@ -161,9 +182,10 @@ function generateStats() {
         Promise.all(promises).then(results => {
             stats = {
                 outcomesByHas: results[0],
-                crimesByType: results[1],
-                crimesByRegion: results[2],
-                crimesByMonth: results[3],
+                outcomesByRegion: results[1],
+                crimesByType: results[2],
+                crimesByRegion: results[3],
+                crimesByMonth: results[4],
             }
             resolve()
         })
@@ -259,7 +281,6 @@ function getCrimesWithinArea(boundingBox, date) {
 }
 
 function getCrimesWithAnOutcome(date_start, date_end) {
-
     const aggregation =
         [
             {
