@@ -44,6 +44,7 @@ export default ({ children }) => {
   useEffect(() => {
     getCrimeTypes()
       .then(result => {
+        result.push('All')
         cDispatch({ type: 'SET_CRIME_TYPES', payload: result })
       });
   }, [])
