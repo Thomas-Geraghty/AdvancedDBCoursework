@@ -43,7 +43,7 @@ export default function MapSearch() {
         e.persist();
         if (e.target.value.length >= 4) {
             geocoderRequest(e.target.value).then((response) => {
-                const items = response.map((element) => {
+                let items = response.map((element) => {
                     delete element.address.country_code;
                     delete element.address.county;
                     return (
@@ -53,6 +53,7 @@ export default function MapSearch() {
                         </li>
                     )
                 })
+                items = items.slice(0, 5);
                 setAutocomplete(items)
             })
         } else {
