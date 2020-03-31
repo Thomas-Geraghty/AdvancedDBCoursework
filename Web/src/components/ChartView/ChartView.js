@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Doughnut, Line } from 'react-chartjs-2';
+import { Doughnut, Line, Bar } from 'react-chartjs-2';
 import { getCrimeStats } from '../../client/API';
 import './ChartView.scss'
 
@@ -36,7 +36,7 @@ const options = {
     },
 };
 
-const doughnutSize = '300px'
+const doughnutSize = 300
 
 export default function ChartView() {
     const [ stats, setStats ] = React.useState([]);
@@ -80,11 +80,72 @@ export default function ChartView() {
                     label: '# Crimes Per Policing Region',
                     data: values,
                     backgroundColor: colors
-                    
+
                 }]
             }
 
             return <Doughnut data={data} options={options} height={doughnutSize}/>
+        }
+    }
+
+    function createCrimesByOutcome() {
+        console.log(stats)
+        if(stats.outcomesByHas) {
+            let dataset = stats.outcomesByHas;
+            let labels = dataset.map(stat => stat._id);
+            let with_values = dataset.map(stat => stat.with_outcome);
+            let without_values = dataset.map(stat => stat.without_outcome);
+            let colors = dataset.map(stat => stringToColour(stat._id));
+
+            const data = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '# With outcome',
+                        data: with_values,
+                        backgroundColor: "rgba(50,205,50,0.5)",
+                        borderColor: "rgba(50,205,50,1)",
+                        borderWidth: 1
+                    },
+                    {
+                        label: '# Without outcome',
+                        data: without_values,
+                        backgroundColor: "rgba(220,20,60,0.5)",
+                        borderColor: "rgba(220,20,60,1)",
+                        borderWidth: 1
+                    }
+                ]
+            }
+
+            const bar_options = {
+                responsive: false,
+                legend: {
+                    display: false,
+                    maintainAspectRatio: true,
+                },
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        type: "logarithmic",
+                        ticks: {
+                            min: 0,
+                            max: 10000000,
+                            callback: function (value, index, values) {
+                                if (value === 10000000) return "10M";
+                                if (value === 2000000) return "2M";
+                                if (value === 500000) return "500K";
+                                if (value === 100000) return "100K";
+                                if (value === 20000) return "20K";
+                                if (value === 5000) return "5K";
+                                if (value === 1000) return "1K";
+                                return null;
+                            }
+                       }
+                    }]
+                }
+            }
+
+            return <Bar data={data} options={bar_options} height={doughnutSize} width={doughnutSize * 2}/>
         }
     }
 
@@ -129,7 +190,7 @@ export default function ChartView() {
                 years[date.getFullYear()][date.toLocaleString('default', { month: 'short' })] = stat.count;
             });
 
-            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
             for(const year in years) {
@@ -161,6 +222,10 @@ export default function ChartView() {
                     <h4>Crimes by Policing Region</h4>
                     {createCrimesByRegion()}
                 </div>
+                <div>
+                    <h4>Outcomes by Crime Type</h4>
+                    {createCrimesByOutcome()}
+                </div>
             </div>
             <div className="charts-row charts-row__single">
                 <div>
@@ -174,6 +239,7 @@ export default function ChartView() {
                     {createCrimesByMonth()}
                 </div>
             </div>
+
         </div>
     )
 }
