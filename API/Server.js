@@ -123,6 +123,9 @@ function routes() {
           res.json(crimesController.getStats().outcomesByHas);
         }
         break;
+      case 'outcomes-by-region':
+        res.json(crimesController.getStats().outcomesByRegion);
+        break;
       case 'crimes-by-type':
         res.json(crimesController.getStats().crimesByType);
         break;
