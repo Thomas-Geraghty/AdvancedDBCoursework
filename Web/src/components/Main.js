@@ -13,7 +13,7 @@ class Main extends Component {
             <HashRouter>
                 <Header key="header" />
                 <div className="content" key="content">
-                    <Route exact path="/" component={MapView} />
+                    <Route exact path="/map" component={MapView} />
                     <Route exact path="/charts" component={ChartView} />
                 </div>
                 <Footer key="footer" />

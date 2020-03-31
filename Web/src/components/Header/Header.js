@@ -7,7 +7,7 @@ class Header extends Component {
             <div className="header">
                 <h1 className="title">UK Police Data</h1>
                 <nav>
-                    <NavLink to="/">Map</NavLink>
+                    <NavLink to="/map">Map</NavLink>
                     <NavLink to="/charts">Charts</NavLink>
                 </nav>
             </div>
