@@ -85,22 +85,22 @@ function routes() {
       SW: req.query.sw.split(',')
     }
 
-    var date_start;
-    if (req.query.start_date) {
+    var date_start, date_end, crime_type;
+    if (req.query.startDate) {
       date_start = new Date(req.query.start_date)
-    } else {
-      date_start = new Date()
-      date_start.setMonth(date_start.getMonth() - 3)
     }
 
-    var date_end;
-    if (req.query.end_date) {
+    if (req.query.endDate) {
       date_end = new Date(req.query.end_date)
-    } else {
-      date_end = new Date()
     }
 
-    crimesController.getCrimesWithinArea(bounding_box, date_start, date_end, req.query.crime_type)
+    if(req.query.crimeType === 'All') {
+      crime_type = null;
+    } else {
+      crime_type = req.query.crimeType;
+    }
+
+    crimesController.getCrimesWithinArea(bounding_box, date_start, date_end, crime_type)
     .then(result => {
       var min = 1000;
       var max = 0;

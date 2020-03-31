@@ -27,9 +27,10 @@ export function getNearbyCrimes(coords, radius) {
 // Takes bounding box and returns crimes within.
 export function getCrimesWithinArea(boundingBox, startDate, endDate, crimeType) {
     var path = `/api/crimes/within-area`
-    var query = `?ne=${boundingBox._northEast.lat},${boundingBox._northEast.lng}&sw=${boundingBox._southWest.lat},${boundingBox._southWest.lng}`
+    var boundingBoxQuery = `?ne=${boundingBox._northEast.lat},${boundingBox._northEast.lng}&sw=${boundingBox._southWest.lat},${boundingBox._southWest.lng}`
+    var optionsQuery = `&startDate=${startDate}&endDate=${endDate}&crimeType=${crimeType}`
 
-    var requestURL = protocol+ url + path + query;
+    var requestURL = protocol+ url + path + boundingBoxQuery + optionsQuery;
 
     return new Promise((resolve) => {
         get(requestURL).then((response) => {

@@ -45,7 +45,6 @@ function intialize() {
         mongodb.intialize()
         .then(() => {
             generateStats().then(() => {
-                console.log(stats);
                 resolve();
             });
         });
@@ -196,6 +195,7 @@ function generateStats() {
         return mongodb.getAggregate('crimes', aggregation );
     }
 
+    /*
     var promises = [
         getCrimesWithAnOutcome(),
         getRegionsWithOutcomes(),
@@ -218,6 +218,10 @@ function generateStats() {
             resolve()
         })
     })
+    */
+   return new Promise((resolve) => {
+       resolve();
+   })
 }
 
 function getStats() {
@@ -258,8 +262,6 @@ function getCrimesNearby(location, distance, date) {
 }
 
 function getCrimesWithinArea(boundingBox, date_start, date_end, crime_type) {
-    // boundingBox = [ latitude, longitude ]
-
     boundingBox = {
         NE: [ parseFloat(boundingBox.NE[0]), parseFloat(boundingBox.NE[1])],
         SW: [ parseFloat(boundingBox.SW[0]), parseFloat(boundingBox.SW[1])]
@@ -308,6 +310,8 @@ function getCrimesWithinArea(boundingBox, date_start, date_end, crime_type) {
             falls_within: { "$first": "$falls_within" }
         }
     })
+
+    console.log(aggregation);
 
     return mongodb.getAggregate('crimes', aggregation);
 }
