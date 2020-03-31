@@ -277,7 +277,7 @@ export default function ChartView() {
                     {createCrimesByRegion()}
                 </div>
                 <div>
-                    <h4>Crimes by Type</h4>
+                    <h4>Crimes by Outcome Ratio</h4>
                     {createOutcomeRatio()}
                 </div>
                 <div>
