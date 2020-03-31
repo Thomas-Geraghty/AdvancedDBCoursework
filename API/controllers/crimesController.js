@@ -258,9 +258,18 @@ function getCrimesWithinArea(boundingBox, date) {
     return mongodb.getAggregate('crimes', aggregation);
 }
 
-function getCrimesWithAnOutcome() {
+function getCrimesWithAnOutcome(date_start, date_end) {
+
     const aggregation =
         [
+            {
+                $match: {
+                    date: {
+                        $gte: date_start,
+                        $lt: date_end
+                    }
+                }
+            },
             {
                 $group: {
                     _id: "$crime_type",
@@ -304,5 +313,6 @@ module.exports = {
     getCrimesNearby: getCrimesNearby,
     getCrimesWithinArea: getCrimesWithinArea,
     getCrimesByRegion: getCrimesByRegion,
+    getCrimesWithAnOutcome: getCrimesWithAnOutcome,
     getSearchResults: getSearchResults,
 }
