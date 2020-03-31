@@ -116,6 +116,27 @@ export default function ChartView() {
         }
     }
 
+    function createOutcomeRatio() {
+        if(stats.outcomeRatio) {
+            let dataset = stats.outcomeRatio;
+            let labels = dataset.map(stat => stat._id);
+            let values = dataset.map(stat => stat.count);
+            let colors = dataset.map(stat => stringToColour(stat._id));
+
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: '# Crime has Outcome',
+                    data: values,
+                    backgroundColor: colors
+
+                }]
+            }
+
+            return <Doughnut data={data} options={options} height={doughnutSize}/>
+        }
+    }
+
     function createCrimesByOutcome() {
         console.log(stats)
         if(stats.outcomesByHas) {
@@ -254,6 +275,10 @@ export default function ChartView() {
                 <div>
                     <h4>Crimes by Policing Region</h4>
                     {createCrimesByRegion()}
+                </div>
+                <div>
+                    <h4>Crimes by Type</h4>
+                    {createOutcomeRatio()}
                 </div>
                 <div>
                     <h4>Outcomes by Crime Type</h4>
