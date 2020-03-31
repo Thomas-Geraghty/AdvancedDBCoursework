@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Doughnut, Line, Bar } from 'react-chartjs-2';
-import { getCrimeStats } from '../../client/API';
+import { getCrimeStats } from '../../components/API';
 import './ChartView.scss'
 
 const data = {
