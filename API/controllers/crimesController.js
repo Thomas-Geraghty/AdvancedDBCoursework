@@ -146,7 +146,7 @@ function generateStats() {
     }
 
     function getCrimesByMonthCount() {
-        const aggregation = [ {"$group" : {_id: "$month", count:{$sum:1}}}, { $sort: { _id: 1 } } ]
+        const aggregation = [ {"$group" : {_id: "$date", count:{$sum:1}}}, { $sort: { _id: 1 } } ]
         return mongodb.getAggregate('crimes', aggregation );
     }
 

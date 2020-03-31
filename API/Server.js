@@ -136,6 +136,9 @@ function routes() {
       case 'crimes-by-month':
         res.json(crimesController.getStats().crimesByMonth);
         break;
+      case 'all':
+        res.json(crimesController.getStats());
+        break;
     }
   });
 }
