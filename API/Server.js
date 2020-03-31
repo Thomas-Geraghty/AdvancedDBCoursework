@@ -112,13 +112,9 @@ function routes() {
     switch(req.params.type) {
       case 'crime-outcomes':
         if (req.query.date_start) {
-          var date_start = new Date(req.query.date_start)
-          var date_end;
-          if (req.query.date_end) {
-            date_end = new Date(req.query.date_end)
-          } else {
-            date_end = new Date()
-          }
+          var date_start = new Date(req.query.date_start);
+          var date_end = req.query.date_end ? new Date(req.query.date_end) : date_end = new Date();
+
           crimesController.getCrimesWithAnOutcome(date_start, date_end)
           .then(result => {
             res.json(result)
