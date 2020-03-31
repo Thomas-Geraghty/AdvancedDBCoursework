@@ -8,7 +8,7 @@
         display: flex;
         margin-bottom: 2rem;
 
-        div {
+        div:not(:last-child) {
             margin-right: 4rem;
         }
 
