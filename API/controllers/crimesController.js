@@ -195,7 +195,6 @@ function generateStats() {
         return mongodb.getAggregate('crimes', aggregation );
     }
 
-    /*
     var promises = [
         getCrimesWithAnOutcome(),
         getRegionsWithOutcomes(),
@@ -218,10 +217,6 @@ function generateStats() {
             resolve()
         })
     })
-    */
-   return new Promise((resolve) => {
-       resolve();
-   })
 }
 
 function getStats() {
@@ -310,8 +305,6 @@ function getCrimesWithinArea(boundingBox, date_start, date_end, crime_type) {
             falls_within: { "$first": "$falls_within" }
         }
     })
-
-    console.log(aggregation);
 
     return mongodb.getAggregate('crimes', aggregation);
 }

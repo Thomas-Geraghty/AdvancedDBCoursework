@@ -85,22 +85,12 @@ function routes() {
       SW: req.query.sw.split(',')
     }
 
-    var date_start, date_end, crime_type;
-    if (req.query.startDate) {
-      date_start = new Date(req.query.start_date)
-    }
+    var startDate, endDate, crimeType;
+    startDate = new Date(req.query.startDate)
+    endDate = new Date(req.query.endDate)
+    crimeType = req.query.crimeType === 'All' ? null : req.query.crimeType
 
-    if (req.query.endDate) {
-      date_end = new Date(req.query.end_date)
-    }
-
-    if(req.query.crimeType === 'All') {
-      crime_type = null;
-    } else {
-      crime_type = req.query.crimeType;
-    }
-
-    crimesController.getCrimesWithinArea(bounding_box, date_start, date_end, crime_type)
+    crimesController.getCrimesWithinArea(bounding_box, startDate, endDate, crimeType)
     .then(result => {
       var min = 1000;
       var max = 0;
