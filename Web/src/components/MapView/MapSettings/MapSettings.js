@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
 import "./MapSettings.scss";
 import { CrimeDataContext } from '../CrimeDataContext';
+import { MapContext } from "../MapContext";
 
 const d = new Date(); 
 
 export default function MapSearch() {
     const { cState, cDispatch } = React.useContext(CrimeDataContext);
+    const { mState, mDispatch } = React.useContext(MapContext);
     const [ active, setActive ] = React.useState(false);
-    const [ dateEnd, setDateEnd ] = React.useState(dateFormatter(new Date() ));
-    const [ dateStart, setDateStart] = React.useState(dateFormatter(new Date(d.setMonth(d.getMonth() - 3))));
+    const [ startDate, setStartDate] = React.useState(dateFormatter(new Date(d.setMonth(d.getMonth() - 3))));
+    const [ endDate, setEndDate ] = React.useState(dateFormatter(new Date() ));
     const [ crimeType, setCrimeType] = React.useState('All');
 
     const crime_options = cState.crime_types.map(type => {
@@ -25,8 +27,8 @@ export default function MapSearch() {
     }
 
     useEffect(() => {
-        cDispatch({ type: 'SET_MAP_SETTINGS', payload: { dateEnd: dateEnd, dateStart: dateStart, crimeType: crimeType } })
-    }, [dateEnd, dateStart, crimeType])
+        mDispatch({ type: 'SET_MAP_SETTINGS', payload: { startDate: startDate, endDate: endDate, crimeType: crimeType } })
+    }, [startDate, endDate, crimeType])
 
     // Render
     return (
@@ -38,12 +40,12 @@ export default function MapSearch() {
                 <form>
                     <div className="map-settings__date-selector">
                         <h4>Date</h4>
-                        <input type="date" name="date-start" value={dateStart}
-                            onChange={(e) => { setDateStart(e.target.value) }}>
+                        <input type="date" name="date-start" value={startDate}
+                            onChange={(e) => { setStartDate(e.target.value) }}>
                         </input>
                         <p>to</p>
-                        <input type="date" name="date-end" value={dateEnd}
-                            onChange={(e) => { setDateEnd(e.target.value) }}>
+                        <input type="date" name="date-end" value={endDate}
+                            onChange={(e) => { setEndDate(e.target.value) }}>
                         </input>
                     </div>
 

@@ -16,8 +16,6 @@ const reducer = (state, action) => {
       return { ...state, nearby: action.payload };
     case 'SET_CRIME_TYPES':
       return { ...state, crime_types: action.payload };
-    case 'SET_MAP_SETTINGS':
-      return { ...state, map_settings: action.payload };
     default:
       break
   }
@@ -30,12 +28,12 @@ export default ({ children }) => {
   // Get Nearby Crime Data
   useEffect(() => {
     if (mState.viewbounds && mState.viewport.zoom > 14) {
-      getCrimesWithinArea(mState.viewbounds)
+      getCrimesWithinArea(mState.viewbounds, mState.map_settings.startDate, mState.map_settings.endDate, mState.map_settings.crimeType)
         .then(result => {
           cDispatch({ type: 'SET_NEARBY', payload: result })
         });
     }
-  }, [mState.viewbounds])
+  }, [mState.viewbounds, mState.map_settings])
 
   // Get crime types
   useEffect(() => {

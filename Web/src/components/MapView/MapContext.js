@@ -27,6 +27,8 @@ const reducer = (state, action) => {
             return { ...state, viewbounds: action.payload };
         case 'GET_USER_LOCATION':
             return userLoc;
+        case 'SET_MAP_SETTINGS':
+            return { ...state, map_settings: action.payload };
         default:
             break;
     }

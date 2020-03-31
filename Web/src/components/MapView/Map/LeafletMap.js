@@ -64,7 +64,6 @@ export default function LeafletMap() {
 
     // Render
     return (
-        console.log(cState),
         <Map
             viewport={mState.viewport}
             ref={map}
