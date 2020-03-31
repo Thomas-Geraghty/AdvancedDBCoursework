@@ -3,7 +3,6 @@ import L from 'leaflet';
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import { MapContext } from '../MapContext';
 import { CrimeDataContext } from '../CrimeDataContext';
-import { svgIconHandler } from '../../../client/Base64icons';
 import './LeafletMap.scss'
 
 
@@ -15,7 +14,7 @@ export default function LeafletMap() {
     // Creates markers for nearby stops
     function createMarkers() {
         if(cState.nearby !== null) {
-            var markers = cState.nearby.map(crime => {
+            const markers = cState.nearby.map(crime => {
                 return createMarker(crime)
             })
             return markers;
@@ -25,19 +24,13 @@ export default function LeafletMap() {
     }
 
     // Creates marker for stop
-    function createMarker(crime, color, bgColor) {
-        if (crime.atco === cState.activeStopID) {
-            color = 'orange';
-            bgColor = 'black';
-        }
-
+    function createMarker(crime) {
         if (mState.viewport.zoom > 10) {
             return <Marker
                 position={[crime._id.coordinates[1], crime._id.coordinates[0]]}
                 icon={new L.divIcon({
-                    html: `${svgIconHandler(crime.count, crime.distribution_point)}`
+                    html: `${createMarkerIcon(crime.count, crime.distribution_point)}`
                 })}
-                onClick={() => { onClick() }}
             >
                 <Popup>
                     Crime count: {crime.count}
@@ -48,19 +41,30 @@ export default function LeafletMap() {
                     <br />
                     </Popup>
             </Marker>
+        }
 
-            function onClick() {
-                if (crime.atco !== cState.activeStopID) {
-                    cDispatch({ type: 'SET_ACTIVE_STOP_ID', payload: crime.atco })
-                } else {
-                    cDispatch({ type: 'RESET' })
-                }
+        function createMarkerIcon(value, distribution_point) {
+            value = distribution_point
+            var sizeValue = Math.min(Math.max(value/2, 25), 200)
+            var colorValue = 100 - distribution_point;
+        
+            return `<svg height="${sizeValue}" width="${sizeValue}">
+                        <circle cx="${sizeValue/2}" cy="${sizeValue/2}" r="${(sizeValue/2)}" fill=${perc2color(colorValue)} />
+                    </svg>`
+        
+            function perc2color(perc) {
+                var r, g, b = 0;
+                r = 255;
+                g = Math.round((perc / 100) * 255);
+                var h = r * 0x10000 + g * 0x100 + b * 0x1;
+                return '#' + ('000000' + h.toString(16)).slice(-6);
             }
         }
     }
 
     // Render
     return (
+        console.log(cState),
         <Map
             viewport={mState.viewport}
             ref={map}
@@ -68,7 +72,6 @@ export default function LeafletMap() {
                 mDispatch({ type: 'SET_VIEWPORT', payload: newviewport });
                 mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() });
             }}
-            onClick={() => { cDispatch({ type: 'RESET' }) }}
             onload={() => { mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() })}}
         >
             <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
