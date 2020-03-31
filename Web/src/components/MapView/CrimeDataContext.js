@@ -1,26 +1,23 @@
 import React, { useEffect } from 'react'
 import { MapContext } from './MapContext'
-import { getCrimesWithinArea, getCrimeTypes } from '../../client/API';
+import { getCrimesWithinArea, getCrimeTypes } from '../API';
 
 export const CrimeDataContext = React.createContext();
 
 const initialState = {
   nearby: [],
-  crime_types: []
+  crime_types: [],
+  map_settings: {}
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'RESET':
-      let reset = {
-        nearby: state.nearby,
-        crime_types: state.crime_types
-      };
-      return reset;
     case 'SET_NEARBY':
       return { ...state, nearby: action.payload };
     case 'SET_CRIME_TYPES':
       return { ...state, crime_types: action.payload };
+    case 'SET_MAP_SETTINGS':
+      return { ...state, map_settings: action.payload };
     default:
       break
   }
