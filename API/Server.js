@@ -111,7 +111,21 @@ function routes() {
   app.get('/api/crimes/stats/:type', (req, res) => {
     switch(req.params.type) {
       case 'crime-outcomes':
-        res.json(crimesController.getStats().outcomesByHas);
+        if (req.query.date_start) {
+          var date_start = new Date(req.query.date_start)
+          var date_end;
+          if (req.query.date_end) {
+            date_end = new Date(req.query.date_end)
+          } else {
+            date_end = new Date()
+          }
+          crimesController.getCrimesWithAnOutcome(date_start, date_end)
+          .then(result => {
+            res.json(result)
+          })
+        } else {
+          res.json(crimesController.getStats().outcomesByHas);
+        }
         break;
       case 'crimes-by-type':
         res.json(crimesController.getStats().crimesByType);
