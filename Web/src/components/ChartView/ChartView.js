@@ -36,6 +36,34 @@ const options = {
     },
 };
 
+const bar_options = {
+    responsive: false,
+    legend: {
+        display: false,
+        maintainAspectRatio: true,
+    },
+    scales: {
+        yAxes: [{
+            display: true,
+            type: "logarithmic",
+            ticks: {
+                min: 0,
+                max: 10000000,
+                callback: function (value, index, values) {
+                    if (value === 10000000) return "10M";
+                    if (value === 2000000) return "2M";
+                    if (value === 500000) return "500K";
+                    if (value === 100000) return "100K";
+                    if (value === 20000) return "20K";
+                    if (value === 5000) return "5K";
+                    if (value === 1000) return "1K";
+                    return null;
+                }
+           }
+        }]
+    }
+}
+
 const doughnutSize = 300
 
 export default function ChartView() {
@@ -117,35 +145,40 @@ export default function ChartView() {
                 ]
             }
 
-            const bar_options = {
-                responsive: false,
-                legend: {
-                    display: false,
-                    maintainAspectRatio: true,
-                },
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        type: "logarithmic",
-                        ticks: {
-                            min: 0,
-                            max: 10000000,
-                            callback: function (value, index, values) {
-                                if (value === 10000000) return "10M";
-                                if (value === 2000000) return "2M";
-                                if (value === 500000) return "500K";
-                                if (value === 100000) return "100K";
-                                if (value === 20000) return "20K";
-                                if (value === 5000) return "5K";
-                                if (value === 1000) return "1K";
-                                return null;
-                            }
-                       }
-                    }]
-                }
+            return <Bar data={data} options={bar_options} height={doughnutSize} width={doughnutSize * 2}/>
+        }
+    }
+
+    function createRegionsByOutcome() {
+        console.log(stats)
+        if(stats.outcomesByRegion) {
+            let dataset = stats.outcomesByRegion;
+            let labels = dataset.map(stat => stat._id);
+            let with_values = dataset.map(stat => stat.with_outcome);
+            let without_values = dataset.map(stat => stat.without_outcome);
+            let colors = dataset.map(stat => stringToColour(stat._id));
+
+            const data = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '# With outcome',
+                        data: with_values,
+                        backgroundColor: "rgba(50,205,50,0.5)",
+                        borderColor: "rgba(50,205,50,1)",
+                        borderWidth: 1
+                    },
+                    {
+                        label: '# Without outcome',
+                        data: without_values,
+                        backgroundColor: "rgba(220,20,60,0.5)",
+                        borderColor: "rgba(220,20,60,1)",
+                        borderWidth: 1
+                    }
+                ]
             }
 
-            return <Bar data={data} options={bar_options} height={doughnutSize} width={doughnutSize * 2}/>
+            return <Bar data={data} options={bar_options} height={doughnutSize * 1.15} width={doughnutSize * 3.5}/>
         }
     }
 
@@ -222,9 +255,15 @@ export default function ChartView() {
                     <h4>Crimes by Policing Region</h4>
                     {createCrimesByRegion()}
                 </div>
+            </div>
+            <div className="charts-row">
                 <div>
                     <h4>Outcomes by Crime Type</h4>
                     {createCrimesByOutcome()}
+                </div>
+                <div>
+                    <h4>Outcomes by Region</h4>
+                    {createRegionsByOutcome()}
                 </div>
             </div>
             <div className="charts-row charts-row__single">
