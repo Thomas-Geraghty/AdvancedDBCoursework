@@ -99,7 +99,7 @@ function getOutcomes() {
 }
 
 function generateStats() {
-    
+
     function getCrimesWithAnOutcome() {
         const aggregation =
             [
@@ -189,12 +189,6 @@ function getCrimesNearby(location, distance, date) {
                 }
             },
             {
-                $project: {
-                    date: { $toDate: { $dateFromString: { dateString: "$month" } } },
-                    location: 1, last_outcome_category: 1, falls_within: 1, street_name: 1, crime_type: 1
-                }
-            },
-            {
                 $match: {
                     date: {
                         $gte: date,
@@ -244,12 +238,6 @@ function getCrimesWithinArea(boundingBox, date) {
                 }
             },
             {
-                $project: {
-                    date: { $toDate: { $dateFromString: { dateString: "$month" } } },
-                    location: 1, last_outcome_category: 1, falls_within: 1, street_name: 1, crime_type: 1
-                }
-            },
-            {
                 $match: {
                     date: {
                         $gte: date,
@@ -268,6 +256,33 @@ function getCrimesWithinArea(boundingBox, date) {
         ]
 
     return mongodb.getAggregate('crimes', aggregation);
+}
+
+function getCrimesWithAnOutcome() {
+    const aggregation =
+        [
+            {
+                $group: {
+                    _id: "$crime_type",
+                    with_outcome: {
+                        $sum: {
+                            $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                        }
+                    },
+                    without_outcome: {
+                        $sum: {
+                            $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                        }
+                    }
+                }
+            }
+         ]
+
+    return mongodb.getAggregate('crimes', aggregation);
+}
+
+function getCrimesByType(type) {
+    return mongodb.getRecords('crimes', { query: { crime_type: type } });
 }
 
 function getCrimesByRegion(region, index, limit) {
