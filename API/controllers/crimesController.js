@@ -283,6 +283,7 @@ module.exports = {
     getCrimeTypes: getCrimeTypes,
     getRegions: getRegions,
     getOutcomes: getOutcomes,
+    getStats: getStats,
 
     getCrimes: getCrimes,
     getCrimesNearby: getCrimesNearby,

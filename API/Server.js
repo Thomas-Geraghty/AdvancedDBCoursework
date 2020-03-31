@@ -107,6 +107,23 @@ function routes() {
   app.get('/api/crimes/outcomes', (req, res) => {
     res.json(crimesController.getOutcomes());
   });
+
+  app.get('/api/crimes/stats/:type', (req, res) => {
+    switch(req.params.type) {
+      case 'crime-outcomes':
+        res.json(crimesController.getStats().outcomesByHas);
+        break;
+      case 'crimes-by-type':
+        res.json(crimesController.getStats().crimesByType);
+        break;
+      case 'crimes-by-region':
+        res.json(crimesController.getStats().crimesByRegion);
+        break;
+      case 'crimes-by-month':
+        res.json(crimesController.getStats().crimesByMonth);
+        break;
+    }
+  });
 }
 
 var httpsServer = https.createServer(credentials, app)
