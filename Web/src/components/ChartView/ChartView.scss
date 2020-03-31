@@ -1,12 +1,24 @@
 .ChartView {
-    display: flex;
-    flex-direction: column;
+    overflow-y: scroll;
+    box-sizing: border-box; 
+    height: 100%;
+    padding: 1rem;
 
     .charts-row {
         display: flex;
+        margin-bottom: 2rem;
 
         div {
-            width: 50%;
+            margin-right: 4rem;
+        }
+
+
+        &__single {
+            div {
+                position: relative;
+                height: 50%;
+                width: 100%;
+            }
         }
     }
 }

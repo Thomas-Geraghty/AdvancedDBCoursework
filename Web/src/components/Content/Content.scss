@@ -4,8 +4,6 @@
     height: 100%;
 
     .content {
-        order: 0;
-        flex: 1 0 auto;
-        align-self: auto;
+        height: calc(100% - 120px);;
     }
 }

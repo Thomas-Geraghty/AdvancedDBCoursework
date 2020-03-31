@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut, Line } from 'react-chartjs-2';
 import { getCrimeStats } from '../../client/API';
 import './ChartView.scss'
 
@@ -31,8 +31,12 @@ const data = {
 const options = {
     legend: {
         display: false,
+        maintainAspectRatio: true,
+        responsive: false
     },
 };
+
+const doughnutSize = '300px'
 
 export default function ChartView() {
     const [ stats, setStats ] = React.useState([]);
@@ -40,7 +44,6 @@ export default function ChartView() {
     useEffect(() => {
         getCrimeStats('all').then(result => {
             setStats(result);
-            console.log(result)
         })
     }, [])
 
@@ -60,12 +63,12 @@ export default function ChartView() {
                 }]
             }
 
-            return <Doughnut data={data} options={options}/>
+            return <Doughnut data={data} options={options} height={doughnutSize}/>
         }
     }
 
     function createCrimesByRegion() {
-        if(stats.crimesByType) {
+        if(stats.crimesByRegion) {
             let dataset = stats.crimesByRegion;
             let labels = dataset.map(stat => stat._id);
             let values = dataset.map(stat => stat.count);
@@ -81,7 +84,67 @@ export default function ChartView() {
                 }]
             }
 
-            return <Doughnut data={data} options={options}/>
+            return <Doughnut data={data} options={options} height={doughnutSize}/>
+        }
+    }
+
+    function createCrimesByTime() {
+        if(stats.crimesByMonth) {
+            let dataset = stats.crimesByMonth;
+            let labels = dataset.map(stat => {
+                let date = new Date(stat._id);
+                return `${date.getFullYear()}-${date.getMonth()}`
+            });
+            let values = dataset.map(stat => stat.count);
+            let colors = dataset.map(stat => stringToColour(stat._id));
+
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: '# Crimes Per Month',
+                    data: values,
+                    backgroundColor: colors
+                }]
+            }
+
+            return <Line data={data} options={options} height={'50rem'}/>
+        }
+    }
+
+    function createCrimesByMonth() {
+        if(stats.crimesByMonth) {
+            let dataset = stats.crimesByMonth;
+            let years = {};
+            let datasets = [];
+
+            // Gets data into year: month: count
+            dataset.forEach(stat => {
+                let date = new Date(stat._id);
+                if(!years[date.getFullYear()]) {
+                    years[date.getFullYear()] = {};
+                }
+            });
+            dataset.forEach(stat => {
+                let date = new Date(stat._id);
+                years[date.getFullYear()][date.toLocaleString('default', { month: 'short' })] = stat.count;
+            });
+
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            for(const year in years) {
+                datasets.push({
+                    label: `Crime by Month in ${year}`,
+                    data: Object.keys(years[year]).map(k => years[year][k]),
+                });
+            }
+
+            const data = {
+                labels: labels,
+                datasets: datasets,
+            }
+
+            return <Line data={data} options={options} height={'50rem'}/>
         }
     }
 
@@ -97,6 +160,18 @@ export default function ChartView() {
                 <div>
                     <h4>Crimes by Policing Region</h4>
                     {createCrimesByRegion()}
+                </div>
+            </div>
+            <div className="charts-row charts-row__single">
+                <div>
+                    <h4>Crimes by Time</h4>
+                    {createCrimesByTime()}
+                </div>
+            </div>
+            <div className="charts-row charts-row__single">
+                <div>
+                    <h4>Crimes by Month</h4>
+                    {createCrimesByMonth()}
                 </div>
             </div>
         </div>
