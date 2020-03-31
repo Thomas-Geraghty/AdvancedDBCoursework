@@ -44,40 +44,6 @@ function intialize() {
     return new Promise((resolve) => {
         mongodb.intialize()
         .then(() => {
-            /*
-            var promises = [
-                new Promise((resolve) => {
-                    mongodb.getDistinct('crimes', { query: "crime_type", fields: { crime_type: 1 } })
-                    .then(result => {
-                        console.log(result)
-                        crimeTypes = result;
-                        resolve();
-                    });
-                }),
-
-                new Promise((resolve) => {
-                    mongodb.getDistinct('crimes', { query: "falls_within", fields: { falls_within: 1 } })
-                    .then(result => {
-                        console.log(result)
-                        regions = result;
-                        resolve();
-                    });
-                }),
-
-                new Promise((resolve) => {
-                    mongodb.getDistinct('crimes', { query: "last_outcome_category", fields: { last_outcome_category: 1 } })
-                    .then(result => {
-                        console.log(result)
-                        outcomes = result;
-                        resolve();
-                    });
-                })
-            ]
-
-            Promise.all(promises).then(() => {
-                resolve();
-            })
-            */
             generateStats().then(() => {
                 console.log(stats);
                 resolve();
@@ -117,6 +83,11 @@ function generateStats() {
                             }
                         }
                     }
+                },
+                {
+                    $sort: {
+                        _id: 1
+                    }
                 }
             ]
 
@@ -140,6 +111,11 @@ function generateStats() {
                             }
                         }
                     }
+                },
+                {
+                    $sort: {
+                        _id: 1
+                    }
                 }
             ]
 
@@ -161,6 +137,11 @@ function generateStats() {
                         _id: "$outcome",
                         count: { $sum: 1 }
                     }
+                },
+                {
+                    $sort: {
+                        _id: 1
+                    }
                 }
             ]
 
@@ -170,24 +151,48 @@ function generateStats() {
     function getCrimesByTypeCount() {
         const aggregation = [
             {
-                $project: {
-                    crime_type: 1,
-                }
+                "$group": { _id: "$crime_type", count: { $sum: 1 } }
             },
             {
-                "$group": { _id: "$crime_type", count: { $sum: 1 } }
+                $sort: {
+                    _id: 1
+                }
             }
         ]
         return mongodb.getAggregate('crimes', aggregation );
     }
 
     function getCrimesByRegionCount() {
-        const aggregation = [ {"$group" : {_id: "$falls_within", count:{$sum:1}}} ]
+        const aggregation = [
+            {
+                $group: {
+                    _id: "$falls_within",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: {
+                    _id: 1
+                }
+            }
+        ]
         return mongodb.getAggregate('crimes', aggregation );
     }
 
     function getCrimesByMonthCount() {
-        const aggregation = [ {"$group" : {_id: "$date", count:{$sum:1}}}, { $sort: { _id: 1 } } ]
+        const aggregation = [
+            {
+                $group: {
+                    _id: "$date",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: {
+                    _id: 1
+                }
+            }
+        ]
         return mongodb.getAggregate('crimes', aggregation );
     }
 
@@ -252,7 +257,7 @@ function getCrimesNearby(location, distance, date) {
     return mongodb.getAggregate('crimes', aggregation);
 }
 
-function getCrimesWithinArea(boundingBox, date) {
+function getCrimesWithinArea(boundingBox, date_start, date_end, crime_type) {
     // boundingBox = [ latitude, longitude ]
 
     boundingBox = {
@@ -273,41 +278,46 @@ function getCrimesWithinArea(boundingBox, date) {
         lon: boundingBox.SW[1] + Math.abs((boundingBox.NE[1] - boundingBox.SW[1]) / 2)
     }
 
-    const aggregation =
-        [
-            {
-                $geoNear: {
-                    near: { type: "Point", coordinates: [ location.lon, location.lat ] },
-                    distanceField: "distance",
-                    maxDistance: radius
-                }
-            },
-            {
-                $match: {
-                    date: {
-                        $gte: date,
-                        $lt: new Date()
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: "$location",
-                    count: { $sum: 1 },
-                    street_name: { "$first": "$street_name" },
-                    falls_within: { "$first": "$falls_within" }
-                }
-            }
-        ]
+    const aggregation = []
+
+    aggregation.push({
+        $geoNear: {
+            near: { type: "Point", coordinates: [ location.lon, location.lat ] },
+            distanceField: "distance",
+            maxDistance: radius
+        }
+    })
+
+    if (date_start) {
+        aggregation.push({ $match: { date: { $gte: date_start } } })
+    }
+
+    if (date_end) {
+        aggregation.push({ $match: { date: { $lt: date_end } } })
+    }
+
+    if (crime_type) {
+        aggregation.push({ $match: { crime_type: crime_type } })
+    }
+
+    aggregation.push({
+        $group: {
+            _id: "$location",
+            count: { $sum: 1 },
+            street_name: { "$first": "$street_name" },
+            falls_within: { "$first": "$falls_within" }
+        }
+    })
 
     return mongodb.getAggregate('crimes', aggregation);
 }
 
-function getCrimesWithAnOutcome(date_start, date_end) {
+function getCrimesWithAnOutcome(date_start, date_end, crime_type) {
     const aggregation =
         [
             {
                 $match: {
+                    crime_type: crime_type,
                     date: {
                         $gte: date_start,
                         $lt: date_end
@@ -327,6 +337,48 @@ function getCrimesWithAnOutcome(date_start, date_end) {
                             $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
                         }
                     }
+                }
+            },
+            {
+                $sort: {
+                    _id: 1
+                }
+            }
+         ]
+
+    return mongodb.getAggregate('crimes', aggregation);
+}
+
+function getRegionsWithOutcomes(date_start, date_end, crime_type) {
+    const aggregation =
+        [
+            {
+                $match: {
+                    crime_type: crime_type,
+                    date: {
+                        $gte: date_start,
+                        $lt: date_end
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$falls_within",
+                    with_outcome: {
+                        $sum: {
+                            $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                        }
+                    },
+                    without_outcome: {
+                        $sum: {
+                            $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
+                        }
+                    }
+                }
+            },
+            {
+                $sort: {
+                    _id: 1
                 }
             }
          ]
@@ -358,5 +410,6 @@ module.exports = {
     getCrimesWithinArea: getCrimesWithinArea,
     getCrimesByRegion: getCrimesByRegion,
     getCrimesWithAnOutcome: getCrimesWithAnOutcome,
+    getRegionsWithOutcomes: getRegionsWithOutcomes,
     getSearchResults: getSearchResults,
 }

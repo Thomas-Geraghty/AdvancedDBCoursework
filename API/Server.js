@@ -19,6 +19,26 @@ crimesController.intialize().then(() => {
   routes()
 });
 
+function wrap_optional_parameters(endpoint, dataset, req, res) {
+  var crime_type;
+  if (req.query.crime_type) {
+    crime_type = req.query.crime_type
+  } else {
+
+  }
+  if (req.query.date_start) {
+    var date_start = new Date(req.query.date_start);
+    var date_end = req.query.date_end ? new Date(req.query.date_end) : date_end = new Date();
+
+    endpoint(date_start, date_end)
+    .then(result => {
+      res.json(result)
+    })
+  } else {
+    res.json(dataset);
+  }
+}
+
 function routes() {
   app.get('/api/crimes', (req, res) => {
     const index = parseInt(req.query.index)
@@ -60,19 +80,27 @@ function routes() {
   });
 
   app.get('/api/crimes/within-area', (req, res) => {
-    const boundingBox = {
+    const bounding_box = {
       NE: req.query.ne.split(','),
       SW: req.query.sw.split(',')
     }
-    var date;
-    if (req.query.date) {
-      date = new Date(req.query.date)
+
+    var date_start;
+    if (req.query.start_date) {
+      date_start = new Date(req.query.start_date)
     } else {
-      date = new Date()
-      date.setMonth(date.getMonth() - 3)
+      date_start = new Date()
+      date_start.setMonth(date_start.getMonth() - 3)
     }
 
-    crimesController.getCrimesWithinArea(boundingBox, date)
+    var date_end;
+    if (req.query.end_date) {
+      date_end = new Date(req.query.end_date)
+    } else {
+      date_end = new Date()
+    }
+
+    crimesController.getCrimesWithinArea(bounding_box, date_start, date_end, req.query.crime_type)
     .then(result => {
       var min = 1000;
       var max = 0;
@@ -111,19 +139,18 @@ function routes() {
   app.get('/api/crimes/stats/:type', (req, res) => {
     switch(req.params.type) {
       case 'crime-outcomes':
-        if (req.query.date_start) {
-          var date_start = new Date(req.query.date_start);
-          var date_end = req.query.date_end ? new Date(req.query.date_end) : date_end = new Date();
-
-          crimesController.getCrimesWithAnOutcome(date_start, date_end)
-          .then(result => {
-            res.json(result)
-          })
-        } else {
-          res.json(crimesController.getStats().outcomesByHas);
-        }
+        wrap_optional_parameters(
+          crimesController.getCrimesWithAnOutcome,
+          crimesController.getStats().outcomesByHas,
+          req, res
+        )
         break;
       case 'outcomes-by-region':
+        wrap_optional_parameters(
+          crimesController.getRegionsWithOutcomes,
+          crimesController.getStats().outcomesByRegion,
+          req, res
+        )
         res.json(crimesController.getStats().outcomesByRegion);
         break;
       case 'outcome-ratio':
