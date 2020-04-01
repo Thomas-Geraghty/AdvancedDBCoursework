@@ -1,0 +1,547 @@
+swagger: "2.0"
+info:
+  description: "This API provides formatted and combined data drawn from the UK street-level open police dataset."
+  version: "1.0.0"
+  title: "UK Police Data"
+
+host: "<vm-ip>"
+basePath: "/api"
+tags:
+- name: "crimes"
+  description: "Crime data"
+schemes:
+- "https"
+paths:
+  /crimes:
+    get:
+      tags:
+      - "crimes"
+      summary: "Unformatted list of crimes"
+      description: ""
+      operationId: "getCrimes"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "index"
+        in: "query"
+        description: "Collection index to start from"
+        required: false
+        default: 0
+        type: "integer"
+      - name: "limit"
+        in: "query"
+        description: "Quantity of documents to return, starting from index"
+        required: false
+        default: 1
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Crime"
+  /crimes/nearby:
+    get:
+      tags:
+      - "crimes"
+      summary: "Crimes within a distance from a location from a date to now"
+      description: ""
+      operationId: "getCrimesNearby"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "lat"
+        in: "query"
+        description: "Location latitude to search from"
+        required: true
+        type: "number"
+      - name: "long"
+        in: "query"
+        description: "Location longitude to search from"
+        required: true
+        type: "number"
+      - name: "dist"
+        in: "query"
+        description: "Radius in meters from the given location to search within"
+        required: true
+        type: "integer"
+      - name: "date"
+        in: "query"
+        description: "Lower date bound. Range runs from this bound to current date"
+        required: false
+        default: "3 months ago"
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Crime"
+  /crimes/within-area:
+    get:
+      tags:
+      - "crimes"
+      summary: "Crimes within a bounding box,  from a location from a date to now"
+      description: ""
+      operationId: "getCrimesWithinArea"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "ne"
+        in: "query"
+        description: "North East corner of the bounding box, specified 'latitude,longitude'"
+        required: true
+        type: "string"
+      - name: "sw"
+        in: "query"
+        description: "South West corner of the bounding box, specified 'latitude,longitude'"
+        required: true
+        type: "string"
+      - name: "crimeType"
+        in: "query"
+        description: "Crime type to search for"
+        required: true
+        type: "string"
+        enum:
+        - "All"
+        - "Anti-social behaviour"
+        - "Bicycle theft"
+        - "Burglary"
+        - "Criminal damage and arson"
+        - "Drugs"
+        - "Other crime"
+        - "Other theft"
+        - "Possession of weapons"
+        - "Public order"
+        - "Robbery"
+        - "Shoplifting"
+        - "Theft from the person"
+        - "Vehicle crime"
+      - name: "startDate"
+        in: "query"
+        description: "Lower date bound"
+        required: true
+        type: "string"
+      - name: "endDate"
+        in: "query"
+        description: "Upper date bound"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Crime"
+  /crimes/regions:
+    get:
+      tags:
+      - "crimes"
+      summary: "List of policing regions"
+      description: ""
+      operationId: "getRegions"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+            example: [
+              "Avon and Somerset Constabulary",
+              "Bedfordshire Police",
+              "British Transport Police",
+              "Cambridgeshire Constabulary",
+              "Cheshire Constabulary"
+            ]
+  /crimes/types:
+    get:
+      tags:
+      - "crimes"
+      summary: "List of crime types"
+      description: ""
+      operationId: "getCrimeTypes"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+            example: [
+              "Anti-social behaviour",
+              "Bicycle theft",
+              "Burglary",
+              "Criminal damage and arson",
+              "Drugs",
+              "Other crime",
+              "Other theft",
+              "Possession of weapons",
+              "Public order",
+              "Robbery",
+              "Shoplifting",
+              "Theft from the person",
+              "Vehicle crime"
+            ]
+  /crimes/outcomes:
+    get:
+      tags:
+      - "crimes"
+      summary: "List of crime outcomes"
+      description: ""
+      operationId: "getOutcomes"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+            example: [
+              "Status update unavailable",
+              "Further investigation is not in the public interest",
+              "Offender given a caution",
+              "Unable to prosecute suspect",
+              "Offender given a drugs possession warning",
+              "Court result unavailable"
+            ]
+  /crimes/stats/crime-outcomes:
+    get:
+      tags:
+      - "crimes"
+      summary: "Crime outcome statistics, grouped by crime type"
+      description: "If date_start is not supplied, it will return the pregenerated whole dataset"
+      operationId: "statsOutcomes"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "crime_type"
+        in: "query"
+        description: "Crime type to search for"
+        required: false
+        type: "string"
+        enum:
+        - "All"
+        - "Anti-social behaviour"
+        - "Bicycle theft"
+        - "Burglary"
+        - "Criminal damage and arson"
+        - "Drugs"
+        - "Other crime"
+        - "Other theft"
+        - "Possession of weapons"
+        - "Public order"
+        - "Robbery"
+        - "Shoplifting"
+        - "Theft from the person"
+        - "Vehicle crime"
+      - name: "date_start"
+        in: "query"
+        description: "Lower date bound"
+        required: false
+        type: "string"
+      - name: "date_end"
+        in: "query"
+        description: "Upper date bound"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/OutcomeByType"
+  /crimes/stats/outcomes-by-region:
+    get:
+      tags:
+      - "crimes"
+      summary: "Crime outcome statistics, grouped by region"
+      description: "If date_start is not supplied, it will return the pregenerated whole dataset"
+      operationId: "getRegionsWithOutcomes"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "crime_type"
+        in: "query"
+        description: "Crime type to search for"
+        required: false
+        type: "string"
+        enum:
+        - "All"
+        - "Anti-social behaviour"
+        - "Bicycle theft"
+        - "Burglary"
+        - "Criminal damage and arson"
+        - "Drugs"
+        - "Other crime"
+        - "Other theft"
+        - "Possession of weapons"
+        - "Public order"
+        - "Robbery"
+        - "Shoplifting"
+        - "Theft from the person"
+        - "Vehicle crime"
+      - name: "date_start"
+        in: "query"
+        description: "Lower date bound"
+        required: false
+        type: "string"
+      - name: "date_end"
+        in: "query"
+        description: "Upper date bound"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/OutcomeByRegion"
+  /crimes/stats/outcome-ratio:
+    get:
+      tags:
+      - "crimes"
+      summary: "Crime outcome statistics, grouped into 'has outcome' and 'no outcome'"
+      description: ""
+      operationId: "outcomeRatio"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/OutcomeRatio"
+  /crimes/stats/crimes-by-type:
+    get:
+      tags:
+      - "crimes"
+      summary: "Crime statistics, grouped by crime type"
+      description: ""
+      operationId: "crimesByType"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/CrimeCount"
+  /crimes/stats/crimes-by-region:
+    get:
+      tags:
+      - "crimes"
+      summary: "Crime statistics, grouped by policing region"
+      description: ""
+      operationId: "crimesByRegion"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/CrimeCount"
+  /crimes/stats/crimes-by-month:
+    get:
+      tags:
+      - "crimes"
+      summary: "Crime statistics, grouped by date of occurence"
+      description: ""
+      operationId: "crimesByMonth"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/CrimeCount"
+  /crimes/stats/all:
+    get:
+      tags:
+      - "crimes"
+      summary: "All pregenerated crime statistics"
+      description: ""
+      operationId: "crimeStats"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/CrimeStats"
+definitions:
+  OutcomeByType:
+    type: "object"
+    properties:
+      _id:
+        type: "string"
+        example: "Anti-social behaviour"
+      with_outcome:
+        type: "integer"
+        example: 0
+      without_outcome:
+        type: "integer"
+        example: 2837593
+  OutcomeByRegion:
+    type: "object"
+    properties:
+      _id:
+        type: "string"
+        example: "Avon and Somerset Constabulary"
+      with_outcome:
+        type: "integer"
+        example: 294839
+      without_outcome:
+        type: "integer"
+        example: 72488
+  OutcomeRatio:
+    type: "object"
+    properties:
+      _id:
+        type: "string"
+        example: "Has outcome"
+      count:
+        type: "integer"
+        example: 10498432
+  CrimeCount:
+    type: "object"
+    properties:
+      _id:
+        type: "string"
+        example: "Anti-social behaviour"
+      count:
+        type: "integer"
+        example: 2837593
+  CrimeStats:
+    type: "object"
+    properties:
+      outcomesByHas:
+        type: "array"
+        items:
+          $ref: "#/definitions/OutcomeByType"
+      outcomesByRegion:
+        type: "array"
+        items:
+          $ref: "#/definitions/OutcomeByRegion"
+      crimesByType:
+        type: "array"
+        items:
+          $ref: "#/definitions/CrimeCount"
+      crimesByRegion:
+        type: "array"
+        items:
+          $ref: "#/definitions/CrimeCount"
+      crimesByMonth:
+        type: "array"
+        items:
+          $ref: "#/definitions/CrimeCount"
+      outcomeRatio:
+        type: "array"
+        items:
+          $ref: "#/definitions/OutcomeRatio"
+  Point:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+        example: "Point"
+      coordinates:
+        type: "array"
+        items:
+          type: "number"
+        example: [0.1, 0.2]
+  Crime:
+    type: "object"
+    properties:
+      crime_id:
+        type: "string"
+        example: "4b89599348c51bcc80abf2fab1e55537b9f5473e9cd654259681be101beda819"
+      month:
+        type: "string"
+        example: "2018-01"
+      reported_by:
+        type: "string"
+        example: "Avon and Somerset Constabulary"
+      falls_within:
+        type: "string"
+        example: "Avon and Somerset Constabulary"
+      location:
+        $ref: "#/definitions/Point"
+      street_name:
+        type: "string"
+        example: "On or near Whytewaters"
+      lsoa_code:
+        type: "string"
+        example: "E01021311"
+      lsoa_name:
+        type: "string"
+        example: "Basildon 022C"
+      crime_type:
+        type: "string"
+        enum:
+        - "Anti-social behaviour"
+        - "Bicycle theft"
+        - "Burglary"
+        - "Criminal damage and arson"
+        - "Drugs"
+        - "Other crime"
+        - "Other theft"
+        - "Possession of weapons"
+        - "Public order"
+        - "Robbery"
+        - "Shoplifting"
+        - "Theft from the person"
+        - "Vehicle crime"
+        example: "Other crime"
+      last_outcome_category:
+        type: "string"
+        enum:
+        - "Investigation complete; no suspect identified"
+        - ""
+        - "Status update unavailable"
+        - "Further investigation is not in the public interest"
+        - "Offender given a caution"
+        - "Unable to prosecute suspect"
+        - "Offender given a drugs possession warning"
+        - "Court result unavailable"
+        - "Court case unable to proceed"
+        - "Offender given community sentence"
+        - "Offender given suspended prison sentence"
+        - "Formal action is not in the public interest"
+        - "Local resolution"
+        - "Offender given conditional discharge"
+        - "Offender sent to prison"
+        - "Offender ordered to pay compensation"
+        - "Offender given penalty notice"
+        - "Offender fined"
+        - "Awaiting court outcome"
+        - "Suspect charged as part of another case"
+        - "Defendant found not guilty"
+        - "Action to be taken by another organisation"
+        - "Offender otherwise dealt with"
+        - "Offender deprived of property"
+        - "Defendant sent to Crown Court"
+        - "Offender given absolute discharge"
+        - "Further action is not in the public interest"
+        - "Under investigation"
+        example: "Investigation complete; no suspect identified"
+      date:
+        type: "string"
+        example: "2018-01-01T00:00:00.000Z"
