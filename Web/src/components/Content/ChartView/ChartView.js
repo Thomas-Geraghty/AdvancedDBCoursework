@@ -206,7 +206,7 @@ export default function ChartView() {
             let dataset = stats.crimesByMonth;
             let labels = dataset.map(stat => {
                 let date = new Date(stat._id);
-                return `${date.getFullYear()}-${date.getMonth()}`
+                return `${date.getFullYear()}-${date.getMonth()+1}`
             });
             let values = dataset.map(stat => stat.count);
             let colors = dataset.map(stat => stringToColour(stat._id));
