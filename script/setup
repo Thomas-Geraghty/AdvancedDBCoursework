@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd Web
+npm install
+cd ..
+cd API
+npm install
+cd ..
+echo "Successfully installed"
