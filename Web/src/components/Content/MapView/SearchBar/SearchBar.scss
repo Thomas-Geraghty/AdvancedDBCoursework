@@ -55,11 +55,12 @@ $input-field: 17.5rem;
 
         &--autocomplete {
             position: absolute;
-            top: 2.5rem;
+            top: 1.5rem;
             list-style: none; 
             width: ($form-width - 2.5rem); 
             background-color: beige;
             display: none;
+            padding: 0;
 
             > li {
                 border-bottom: 1px solid grey;

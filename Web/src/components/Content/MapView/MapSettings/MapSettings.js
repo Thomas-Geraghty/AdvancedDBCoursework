@@ -6,7 +6,7 @@ import { MapContext } from "../MapContext";
 const d = new Date(); 
 
 export default function MapSearch() {
-    const { cState, cDispatch } = React.useContext(CrimeDataContext);
+    const { cState } = React.useContext(CrimeDataContext);
     const { mState, mDispatch } = React.useContext(MapContext);
     const [ active, setActive ] = React.useState(false);
     const [ startDate, setStartDate] = React.useState(dateFormatter(new Date(d.setMonth(d.getMonth() - 3))));
@@ -17,6 +17,10 @@ export default function MapSearch() {
         return <option value={type}>{type}</option>
     })
 
+    /**
+     * Formats ISO date into the correct format for use in a
+     * the input field type 'date' (a datepicker used in forms).
+     */
     function dateFormatter(date) {
         let dd = date.getDate();
         let mm = date.getMonth() + 1;
@@ -26,11 +30,17 @@ export default function MapSearch() {
         return `${yyyy}-${mm}-${dd}`;
     }
 
+    /**
+     * Updates map settings in the MapContext whenever startDate, endDate or crimeType
+     * is updated. These values are acquired from the form inside the map setting option menu.
+     */
     useEffect(() => {
         mDispatch({ type: 'SET_MAP_SETTINGS', payload: { startDate: startDate, endDate: endDate, crimeType: crimeType } })
     }, [startDate, endDate, crimeType])
 
-    // Render
+    /**
+     * Renders map settings element and inner form.
+     */
     return (
         <div className={`map-settings ${ active ? "active" : "" }`}>
             <button className="button button--square button--color-1" onClick={() => { active ? setActive(false) : setActive(true) }}>

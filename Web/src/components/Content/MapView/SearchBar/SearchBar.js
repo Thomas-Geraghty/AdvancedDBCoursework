@@ -1,47 +1,31 @@
 import React from "react";
-import "./SearchBar.scss";
 import { MapContext } from '../MapContext';
+import { geocoderRequest } from "../../../API";
+import "./SearchBar.scss";
 
 export default function MapSearch() {
     const { mDispatch } = React.useContext(MapContext);
     const [ autocomplete, setAutocomplete ] = React.useState([]);
 
-    function geocoderRequest(value) {
-        const protocol = "https://";
-        const url = 'nominatim.openstreetmap.org';
-        const path = '/search?q=';
-        const format = '&format=json&addressdetails=1';
-        const locality = "West Midlands, England, United Kingdom";
-        const xhr = new XMLHttpRequest();
-
-        var query = `${value} ${locality}`.replace(/[^\w\s]/gi, '').replace(/ /g, '+');
-        var requestURL = protocol + url + path + query + format;
-        xhr.open('GET', requestURL, true);
-        xhr.send();
-
-        return new Promise((resolve) => {
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    resolve(response);
-                }
+    /**
+     *  Handles submitting search, selects first entry (aslong as one exists)
+     */ 
+    function onSubmit(e) {
+        e.preventDefault();
+        geocoderRequest(e.target.input_origin.value).then((response) => {
+            if(response.length > 0) {
+                mDispatch({ type: 'SET_VIEWPORT', payload: { center: [response[0].lat, response[0].lon], zoom: 15 } });
+                setAutocomplete(null)
             }
         })
     }
 
-    // Handles submitting search, selects first entry
-    function onSubmit(e) {
-        e.preventDefault();
-        geocoderRequest(e.target.input_origin.value).then((response) => {
-            mDispatch({ type: 'SET_VIEWPORT', payload: { center: [response[0].lat, response[0].lon], zoom: 15 } });
-            setAutocomplete(null)
-        })
-    }
-
-    // Handles live suggestions whilst typing
+    /**
+     * Gives live suggestions whilst typing as long as over 3 letters are entered.
+     */
     function onInput(e) {
         e.persist();
-        if (e.target.value.length >= 4) {
+        if (e.target.value.length >= 3) {
             geocoderRequest(e.target.value).then((response) => {
                 let items = response.map((element) => {
                     delete element.address.country_code;
@@ -61,7 +45,7 @@ export default function MapSearch() {
         }
     }
 
-    // Render
+    // Renders search bar.
     return (
         <div className="search-bar">
             <form className="form" onSubmit={onSubmit}>

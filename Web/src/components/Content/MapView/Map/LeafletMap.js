@@ -8,10 +8,14 @@ import './LeafletMap.scss'
 
 export default function LeafletMap() {
     const { mState, mDispatch } = React.useContext(MapContext);
-    const { cState, cDispatch } = React.useContext(CrimeDataContext);
+    const { cState } = React.useContext(CrimeDataContext);
     const map = React.useRef();
 
-    // Creates markers for nearby stops
+    /**
+     * Creates markers representing crimes based on data from CrimeDataContext.
+     * Sizes and colors are automatically adjusted based on relative values
+     * Plots onto map whenever context state field 'nearby' is updated.
+     */
     function createMarkers() {
         if(cState.nearby !== null) {
             const markers = cState.nearby.map(crime => {
@@ -23,7 +27,7 @@ export default function LeafletMap() {
         }
     }
 
-    // Creates marker for stop
+    // Creates actual marker element.
     function createMarker(crime) {
         if (mState.viewport.zoom > 10) {
             return <Marker
@@ -62,7 +66,9 @@ export default function LeafletMap() {
         }
     }
 
-    // Render
+    /**
+     * Renders LeafletMap element, TileLayer (provided by OSM) and Marker elements.
+     */
     return (
         <Map
             viewport={mState.viewport}
@@ -71,7 +77,7 @@ export default function LeafletMap() {
                 mDispatch({ type: 'SET_VIEWPORT', payload: newviewport });
                 mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() });
             }}
-            onload={() => { mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() })}}
+            onload={() => { mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() }) }}
         >
             <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
             {createMarkers()}

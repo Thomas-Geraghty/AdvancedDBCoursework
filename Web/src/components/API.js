@@ -1,9 +1,15 @@
-var protocol = "https://";
-var url = '127.0.0.1:8443';
+/**
+ * API connection info.
+ */
+const protocol = "https://";
+const host = '127.0.0.1:8443';
 
+/**
+ * Gets crime types from the API.
+ */
 export function getCrimeTypes() {
     var path = `/api/crimes/types`
-    var requestURL = protocol + url + path;
+    var requestURL = protocol + host + path;
 
     return new Promise((resolve) => {
         get(requestURL).then((response) => {
@@ -12,25 +18,16 @@ export function getCrimeTypes() {
     })
 }
 
-// Takes coordinates and distance (radius) around coord and gets all crimes
-export function getNearbyCrimes(coords, radius) {
-    var path = `/api/crimes/nearby?lat=${coords[0]}&lon=${coords[1]}&dist=${radius}`
-    var requestURL = protocol+ url + path;
-
-    return new Promise((resolve) => {
-        get(requestURL).then((response) => {
-            resolve(response);
-        })
-    })
-}
-
-// Takes bounding box and returns crimes within.
+/**
+ * Takes map info (bounding box, map settings etc) and returns crimes within 
+ * map viewport that match the settings provided.
+*/
 export function getCrimesWithinArea(boundingBox, startDate, endDate, crimeType) {
     var path = `/api/crimes/within-area`
     var boundingBoxQuery = `?ne=${boundingBox._northEast.lat},${boundingBox._northEast.lng}&sw=${boundingBox._southWest.lat},${boundingBox._southWest.lng}`
     var optionsQuery = `&startDate=${startDate}&endDate=${endDate}&crimeType=${crimeType}`
 
-    var requestURL = protocol+ url + path + boundingBoxQuery + optionsQuery;
+    var requestURL = protocol+ host + path + boundingBoxQuery + optionsQuery;
 
     return new Promise((resolve) => {
         get(requestURL).then((response) => {
@@ -39,10 +36,13 @@ export function getCrimesWithinArea(boundingBox, startDate, endDate, crimeType) 
     })
 }
 
-// Gets stats
+/**
+ * Get stats for ChartsView page. 
+ * Contains all stats used.
+ */
 export function getCrimeStats(type) {
     var path = `/api/crimes/stats/${type}`
-    var requestURL = protocol+ url + path;
+    var requestURL = protocol+ host + path;
 
     return new Promise((resolve) => {
         get(requestURL).then((response) => {
@@ -51,7 +51,26 @@ export function getCrimeStats(type) {
     })
 }
 
-// Sends get request to API server and handles response.
+/**
+ * Geocoder request sent to Nominatim (OSM Geocoder API)
+ * Auto appends 'United Kingdom' to search string to ensure it will be a U.K address.
+ */
+export function geocoderRequest(value) {
+    const protocol = "https://";
+    const host = 'nominatim.openstreetmap.org';
+    const path = '/search?q=';
+    const format = '&format=json&addressdetails=1';
+    const locality = "United Kingdom";
+
+    var query = `${value} ${locality}`.replace(/[^\w\s]/gi, '').replace(/ /g, '+');
+    var requestURL = protocol + host + path + query + format;
+
+    return get(requestURL);
+}
+
+/**
+ * Sends get request to API server (or any URL passed) and handles response.
+ */
 function get(url) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);

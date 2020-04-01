@@ -6,16 +6,16 @@ import './ChartView.scss'
 const options = {
     legend: {
         display: false,
-        maintainAspectRatio: true,
-        responsive: false
+        maintainAspectRatio: false,
+        responsive: true
     },
 };
 
 const bar_options = {
-    responsive: false,
     legend: {
         display: false,
         maintainAspectRatio: true,
+        responsive: false
     },
     scales: {
         yAxes: [{
@@ -39,17 +39,24 @@ const bar_options = {
     }
 }
 
-const doughnutSize = 300
+const doughnutSize = 150
 
 export default function ChartView() {
     const [ stats, setStats ] = React.useState([]);
 
+    /**
+     * Gets all the crime stats and stores them into local state
+     */
     useEffect(() => {
         getCrimeStats('all').then(result => {
             setStats(result);
         })
     }, [])
 
+    /**
+     * Create a pie chart (doughnut) representing the amount of crimes
+     * committed by type.
+     */
     function createCrimesByType() {
         if(stats.crimesByType) {
             let dataset = stats.crimesByType;
@@ -66,10 +73,14 @@ export default function ChartView() {
                 }]
             }
 
-            return <Doughnut data={data} options={options} height={doughnutSize}/>
+            return <Doughnut data={data} options={options} className={'doughnut'}/>
         }
     }
 
+    /**
+     * Create a pie chart (doughnut) representing the amount of crimes
+     * committed by policing region.
+     */
     function createCrimesByRegion() {
         if(stats.crimesByRegion) {
             let dataset = stats.crimesByRegion;
@@ -87,10 +98,14 @@ export default function ChartView() {
                 }]
             }
 
-            return <Doughnut data={data} options={options} height={doughnutSize}/>
+            return <Doughnut data={data} options={options} className={'doughnut'}/>
         }
     }
 
+    /**
+     * Create a pie chart (doughnut) representing the amount of crimes
+     * with an outcome versus those without an outcome.
+     */
     function createOutcomeRatio() {
         if(stats.outcomeRatio) {
             let dataset = stats.outcomeRatio;
@@ -108,18 +123,20 @@ export default function ChartView() {
                 }]
             }
 
-            return <Doughnut data={data} options={options} height={doughnutSize}/>
+            return <Doughnut data={data} options={options} className={'doughnut'}/>
         }
     }
 
+    /**
+    * Create a bar chart representing the amount of crimes
+    * with outcomes on a crime type basis.
+    */
     function createCrimesByOutcome() {
-        console.log(stats)
         if(stats.outcomesByHas) {
             let dataset = stats.outcomesByHas;
             let labels = dataset.map(stat => stat._id);
             let with_values = dataset.map(stat => stat.with_outcome);
             let without_values = dataset.map(stat => stat.without_outcome);
-            let colors = dataset.map(stat => stringToColour(stat._id));
 
             const data = {
                 labels: labels,
@@ -141,18 +158,20 @@ export default function ChartView() {
                 ]
             }
 
-            return <Bar data={data} options={bar_options} height={doughnutSize} width={doughnutSize * 2}/>
+            return <Bar data={data} options={bar_options} width={500}/>
         }
     }
 
+    /**
+    * Create a bar chart representing the amount of crimes
+    * with outcomes on a policing region basis.
+    */
     function createRegionsByOutcome() {
-        console.log(stats)
         if(stats.outcomesByRegion) {
             let dataset = stats.outcomesByRegion;
             let labels = dataset.map(stat => stat._id);
             let with_values = dataset.map(stat => stat.with_outcome);
             let without_values = dataset.map(stat => stat.without_outcome);
-            let colors = dataset.map(stat => stringToColour(stat._id));
 
             const data = {
                 labels: labels,
@@ -174,10 +193,14 @@ export default function ChartView() {
                 ]
             }
 
-            return <Bar data={data} options={bar_options} height={doughnutSize * 1.5} width={doughnutSize * 5}/>
+            return <Bar data={data} options={bar_options} height={50}/>
         }
     }
 
+    /**
+    * Create a line graph representing the amount of crimes
+    * committed over the time frame of the dataset
+    */
     function createCrimesByTime() {
         if(stats.crimesByMonth) {
             let dataset = stats.crimesByMonth;
@@ -197,10 +220,14 @@ export default function ChartView() {
                 }]
             }
 
-            return <Line data={data} options={options} height={'50rem'}/>
+            return <Line data={data} options={options} height={50}/>
         }
     }
 
+    /**
+    * Create a line graph representing the amount of crimes
+    * committed each month (comparing between each year in the dataset).
+    */
     function createCrimesByMonth() {
         if(stats.crimesByMonth) {
             let dataset = stats.crimesByMonth;
@@ -238,20 +265,20 @@ export default function ChartView() {
         }
     }
 
-    // Render
+    // Render charts
     return (
         <div className="ChartView">
             <h3>Charts</h3>
             <div className="charts-row">
-                <div>
+                <div className="doughnut">
                     <h4>Crimes by Type</h4>
                     {createCrimesByType()}
                 </div>
-                <div>
+                <div className="doughnut">
                     <h4>Crimes by Policing Region</h4>
                     {createCrimesByRegion()}
                 </div>
-                <div>
+                <div className="doughnut">
                     <h4>Crimes by Outcome Ratio</h4>
                     {createOutcomeRatio()}
                 </div>
@@ -260,8 +287,7 @@ export default function ChartView() {
                     {createCrimesByOutcome()}
                 </div>
             </div>
-            <div className="charts-row">
-
+            <div className="charts-row charts-row__single">
                 <div>
                     <h4>Outcomes by Region</h4>
                     {createRegionsByOutcome()}
@@ -284,7 +310,10 @@ export default function ChartView() {
     )
 }
 
-var stringToColour = function(str) {
+/**
+ * Takes string and converts it into a color
+ */
+function stringToColour(str) {
     var hash = 0;
     for (var i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);

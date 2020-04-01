@@ -2,31 +2,25 @@ import React, { useEffect } from 'react'
 
 export const MapContext = React.createContext()
 
-var userLoc = [];
-
+/**
+ * Intial state setup with empty objects.
+ */
 const initialState = {
     viewport: null,
     viewbounds: null,
     location: null
 };
 
+/**
+ * Reducer function for easily accessing context state outside of provider.
+ * Used by consumers that subscribe to this.
+ */
 const reducer = (state, action) => {
-
     switch (action.type) {
         case 'SET_VIEWPORT':
-            if(state.viewport !== action.payload) {
-                return { ...state, viewport: action.payload };
-            }
-            break;
-        case 'SET_LOCATION':
-            if(state.location !== action.payload) {
-                return { ...state, location: action.payload };
-            }
-            break;
+            return { ...state, viewport: action.payload };
         case 'SET_VIEWBOUNDS':
             return { ...state, viewbounds: action.payload };
-        case 'GET_USER_LOCATION':
-            return userLoc;
         case 'SET_MAP_SETTINGS':
             return { ...state, map_settings: action.payload };
         default:
@@ -37,11 +31,13 @@ const reducer = (state, action) => {
 export default ({ children }) => {
     const [mState, mDispatch] = React.useReducer(reducer, initialState)
 
-    // GPS stuff for setting map to user location
+    /**
+     * Sets viewport to user location (if allowed) and if not, set it to Birmingham U.K.
+     * Runs only at first load.
+     */
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
-                userLoc = [position.coords.latitude, position.coords.longitude];
                 if (mState.viewport === null) {
                     mDispatch({ type: 'SET_VIEWPORT', payload: { center: [position.coords.latitude, position.coords.longitude], zoom: 16 } })
                 }

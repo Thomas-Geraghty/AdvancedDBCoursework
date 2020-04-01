@@ -4,12 +4,19 @@ import { getCrimesWithinArea, getCrimeTypes } from '../API';
 
 export const CrimeDataContext = React.createContext();
 
+/**
+ * Intial state setup with empty objects.
+ */
 const initialState = {
   nearby: [],
   crime_types: [],
   map_settings: {}
 };
 
+/**
+ * Reducer function for easily accessing context state outside of provider.
+ * Used by consumers that subscribe to this.
+ */
 const reducer = (state, action) => {
   switch (action.type) {
     case 'SET_NEARBY':
@@ -22,10 +29,15 @@ const reducer = (state, action) => {
 };
 
 export default ({ children }) => {
-  const [ cState, cDispatch ] = React.useReducer(reducer, initialState)
+  const [cState, cDispatch] = React.useReducer(reducer, initialState)
   const { mState } = React.useContext(MapContext);
 
-  // Get Nearby Crime Data
+  /**
+   * Gets nearby crime data if viewbounds is set and viewport is zoomed in enough.
+   * Sets results into context state field 'nearby' which is then accessible by any component
+   * that subscribes to this context provider.
+   * Runs every time the viewbounds change or the map settings are updated.
+   */
   useEffect(() => {
     if (mState.viewbounds && mState.viewport.zoom > 14) {
       getCrimesWithinArea(mState.viewbounds, mState.map_settings.startDate, mState.map_settings.endDate, mState.map_settings.crimeType)
@@ -35,7 +47,10 @@ export default ({ children }) => {
     }
   }, [mState.viewbounds, mState.map_settings])
 
-  // Get crime types
+  /**
+  * Gets crime types and sets them into the context state.
+  * Accessible by any component that subscribes to this context provider.
+  */
   useEffect(() => {
     getCrimeTypes()
       .then(result => {
