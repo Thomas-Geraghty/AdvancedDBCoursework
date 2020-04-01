@@ -224,22 +224,17 @@ function getCrimesNearby(location, distance, date) {
 // matching the crime type given. Central location is defined by the center of
 // the bounding box, within a radius of the smallest of width and height.
 function getCrimesWithinArea(boundingBox, date_start, date_end, crime_type) {
-    boundingBox = {
-        NE: [ parseFloat(boundingBox.NE[0]), parseFloat(boundingBox.NE[1])],
-        SW: [ parseFloat(boundingBox.SW[0]), parseFloat(boundingBox.SW[1])]
-    }
-
     var height = Math.abs(boundingBox.NE[0] - boundingBox.SW[0])
     var width = Math.abs(boundingBox.NE[1] - boundingBox.SW[1])
 
     var height_meters = height * 111320
-    var width_meters = width * ((4007500 * Math.cos(height * (Math.PI / 180))) / (2 * Math.PI))
+    var width_meters = Math.abs(width * ((4007500 * Math.cos(height * (Math.PI / 180))) / (2 * Math.PI)))
 
-    var radius = Math.min(height_meters, width_meters) / 1.5
+    var radius = Math.min(height_meters, width_meters, 10000) / 1.5
 
     var location = {
-        lat: boundingBox.SW[0] + Math.abs((boundingBox.NE[0] - boundingBox.SW[0]) / 2),
-        lon: boundingBox.SW[1] + Math.abs((boundingBox.NE[1] - boundingBox.SW[1]) / 2)
+        lat: boundingBox.SW[0] + ((boundingBox.NE[0] - boundingBox.SW[0]) / 2),
+        lon: boundingBox.SW[1] + ((boundingBox.NE[1] - boundingBox.SW[1]) / 2)
     }
 
     const aggregation = []
