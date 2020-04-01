@@ -19,6 +19,8 @@ crimesController.intialize().then(() => {
   routes()
 });
 
+// Used for extra stats queries, wraps all the optional parameters and returns
+// the original dataset if none are supplied
 function wrap_optional_parameters(endpoint, dataset, req, res) {
   var crime_type;
   if (req.query.crime_type) {
@@ -39,20 +41,11 @@ function wrap_optional_parameters(endpoint, dataset, req, res) {
   }
 }
 
+// Create API routes, post initialization
 function routes() {
   app.get('/api/crimes', (req, res) => {
     const index = parseInt(req.query.index)
     const limit = parseInt(req.query.limit)
-
-    crimesController.getCrimes(index, limit).then(result => {
-      res.json(result);
-    });
-  });
-
-  app.get('/api/crimes/search', (req, res) => {
-    const index = req.query.index;
-    const limit = req.query.limit
-    const searchString = req.query.search
 
     crimesController.getCrimes(index, limit).then(result => {
       res.json(result);

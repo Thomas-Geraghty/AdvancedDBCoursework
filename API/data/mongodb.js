@@ -25,6 +25,7 @@ module.exports = {
         console.log("mongodb disconnected");
     },
 
+    // Runs a find on the given collection, defined by the options
     getRecords: (collection, options) => {
         if(typeof options.query == "undefined") { options.query = {} };
         if(typeof options.fields == "undefined") { options.fields = { _id: 0 } };
@@ -41,7 +42,7 @@ module.exports = {
         })
     },
 
-
+    // runs a distinct on the given collection, defined by the options
     getDistinct: (collection, options) => {
         if(typeof options.query == "undefined") { options.query = {} };
         if(typeof options.fields == "undefined") { options.fields = { _id: 0 } };
@@ -55,6 +56,8 @@ module.exports = {
         })
     },
 
+    // Runs an aggregation query on the collection, defined by the collection
+    // and aggregation pipeline supplied
     getAggregate: (collection, aggregate) => {
         return new Promise((resolve) => {
             _db.collection(collection).aggregate(aggregate)
