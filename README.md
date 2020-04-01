@@ -15,7 +15,9 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./API/cert/self
 On first run, run `script/setup` from the project root.
 
 From the project root, run `script/start` to start the API and frontend server
-processes. Both will log to the same console window
+processes. Both will log to the same console window. If your server is running
+on a different machine, run `REACT_APP_API_HOST=<host-ip> script/start` where
+`host-ip` is the IP of the other machine.
 
 The console will display `Initialized controller` when the API is ready for
 queries.
