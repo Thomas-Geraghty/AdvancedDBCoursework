@@ -2,7 +2,9 @@
  * API connection info.
  */
 const protocol = "https://";
-const host = '127.0.0.1:8443';
+const hostname = process.env.REACT_APP_API_HOST || '127.0.0.1';
+const port = '8443'
+const host = hostname + ':' + port
 
 /**
  * Gets crime types from the API.
@@ -19,7 +21,7 @@ export function getCrimeTypes() {
 }
 
 /**
- * Takes map info (bounding box, map settings etc) and returns crimes within 
+ * Takes map info (bounding box, map settings etc) and returns crimes within
  * map viewport that match the settings provided.
 */
 export function getCrimesWithinArea(boundingBox, startDate, endDate, crimeType) {
@@ -37,7 +39,7 @@ export function getCrimesWithinArea(boundingBox, startDate, endDate, crimeType) 
 }
 
 /**
- * Get stats for ChartsView page. 
+ * Get stats for ChartsView page.
  * Contains all stats used.
  */
 export function getCrimeStats(type) {
