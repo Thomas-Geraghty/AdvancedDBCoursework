@@ -10,7 +10,6 @@ var config = {
     //server details
     server: {
         host: '0.0.0.0',
-        http_port: '8080',
         https_port: '8443'
     }
 }
