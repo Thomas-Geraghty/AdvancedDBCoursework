@@ -1,5 +1,4 @@
 const fs = require('fs')
-const http = require('http')
 const https = require('https')
 const privateKey = fs.readFileSync('cert/selfsigned.key', 'utf-8')
 const certificate = fs.readFileSync('cert/selfsigned.crt', 'utf-8')
@@ -22,17 +21,16 @@ crimesController.intialize().then(() => {
 // Used for extra stats queries, wraps all the optional parameters and returns
 // the original dataset if none are supplied
 function wrap_optional_parameters(endpoint, dataset, req, res) {
-  var crime_type;
+  var crime_type = null;
   if (req.query.crime_type) {
     crime_type = req.query.crime_type
-  } else {
-
   }
+
   if (req.query.date_start) {
     var date_start = new Date(req.query.date_start);
     var date_end = req.query.date_end ? new Date(req.query.date_end) : date_end = new Date();
 
-    endpoint(date_start, date_end)
+    endpoint(date_start, date_end, crime_type)
     .then(result => {
       res.json(result)
     })
@@ -44,8 +42,23 @@ function wrap_optional_parameters(endpoint, dataset, req, res) {
 // Create API routes, post initialization
 function routes() {
   app.get('/api/crimes', (req, res) => {
-    const index = parseInt(req.query.index)
-    const limit = parseInt(req.query.limit)
+    var index;
+    if (req.query.index) {
+      index = parseInt(req.query.index)
+    } else {
+      index = 0
+    }
+
+    index = Math.max(0, index)
+
+    var limit;
+    if (req.query.limit) {
+      limit = parseInt(req.query.limit)
+    } else {
+      limit = 50
+    }
+
+    limit = Math.max(1, limit)
 
     crimesController.getCrimes(index, limit).then(result => {
       res.json(result);
@@ -53,11 +66,28 @@ function routes() {
   });
 
   app.get('/api/crimes/nearby', (req, res) => {
-    const location = {
-      lat: parseFloat(req.query.lat),
-      lon: parseFloat(req.query.lon)
+    var lat = parseFloat(req.query.lat)
+    var lon = parseFloat(req.query.lon)
+
+    if ((lat < -90) || (lat > 90)) {
+      return res.json({error: "Latitude must be in the range -90 - 90"})
     }
+
+    if ((lon < -180) || (lon > 180)) {
+      return res.json({error: "Longitude must be in the range -180 - 180"})
+    }
+
+    const location = {
+      lat: lat,
+      lon: lon
+    }
+
     const distance = parseFloat(req.query.dist);
+
+    if (distance < 0) {
+      return res.json({error: "Distance cannot be negative"})
+    }
+
     var date;
     if (req.query.date) {
       date = new Date(req.query.date)
@@ -73,9 +103,28 @@ function routes() {
   });
 
   app.get('/api/crimes/within-area', (req, res) => {
-    const bounding_box = {
-      NE: req.query.ne.split(','),
-      SW: req.query.sw.split(',')
+    var ne = req.query.ne.split(',')
+    var sw = req.query.sw.split(',')
+
+    bounding_box = {
+      NE: [ parseFloat(ne[0]), parseFloat(ne[1])],
+      SW: [ parseFloat(sw[0]), parseFloat(sw[1])]
+    }
+
+    if ((bounding_box.NE[0] < -90) || (bounding_box.NE[0] > 90)) {
+      return res.json({error: "NE latitude must be in the range -90 - 90"})
+    }
+
+    if ((bounding_box.SW[0] < -90) || (bounding_box.SW[0] > 90)) {
+      return res.json({error: "SW latitude must be in the range -90 - 90"})
+    }
+
+    if ((bounding_box.NE[1] < -180) || (bounding_box.NE[1] > 180)) {
+      return res.json({error: "NE longitude must be in the range -180 - 180"})
+    }
+
+    if ((bounding_box.SW[1] < -180) || (bounding_box.SW[1] > 180)) {
+      return res.json({error: "SW longitude must be in the range -180 - 180"})
     }
 
     var startDate, endDate, crimeType;
