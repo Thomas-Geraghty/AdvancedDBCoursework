@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { MapContext } from './MapContext'
+import { MapContext } from './MapView/MapContext'
 import { getCrimesWithinArea, getCrimeTypes } from '../API';
 
 export const CrimeDataContext = React.createContext();

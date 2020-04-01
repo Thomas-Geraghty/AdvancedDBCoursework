@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import "./MapSettings.scss";
-import { CrimeDataContext } from '../CrimeDataContext';
+import { CrimeDataContext } from '../../CrimeDataContext';
 import { MapContext } from "../MapContext";
 
 const d = new Date(); 

@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { HashRouter, Route } from "react-router-dom";
 import Header from "./Header/Header"
 import Footer from "./Footer/Footer"
-import MapView from "./MapView/MapView";
-import ChartView from "./ChartView/ChartView";
+import MapView from "./Content/MapView/MapView";
+import ChartView from "./Content/ChartView/ChartView";
 import '../styles/Main.scss';
 
 

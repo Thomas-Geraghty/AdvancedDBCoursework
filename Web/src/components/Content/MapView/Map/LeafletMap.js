@@ -2,7 +2,7 @@ import React from 'react';
 import L from 'leaflet';
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import { MapContext } from '../MapContext';
-import { CrimeDataContext } from '../CrimeDataContext';
+import { CrimeDataContext } from '../../CrimeDataContext';
 import './LeafletMap.scss'
 
 

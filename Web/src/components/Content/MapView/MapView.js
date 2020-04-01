@@ -1,6 +1,6 @@
 import React from "react";
 import MapContext from './MapContext'
-import CrimeDataContext from './CrimeDataContext'
+import CrimeDataContext from '../CrimeDataContext'
 import LeafletMap from './Map/LeafletMap.js';
 import SearchBar from './SearchBar/SearchBar';
 import MapSettings from './MapSettings/MapSettings';
