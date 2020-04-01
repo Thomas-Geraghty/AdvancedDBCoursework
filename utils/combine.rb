@@ -1,3 +1,22 @@
+# Takes files in a `data` directory relative to this script with the structure
+#
+# ```
+# data
+# ->2019-11
+# ->2019-12
+# ->2020-01
+# ->2020-02
+# ->year-month
+# ```
+#
+# Any filenames containing `street` will be appended to `street.csv`
+#
+# Any filenames containing `outcome` will be appended to `outcome.csv`
+#
+# Both `street.csv` and `outcome.csv` will be written to the `data` directory
+#
+# Run with `ruby combine.rb`
+
 months = Dir['data/*']
 regions = {}
 
@@ -44,6 +63,7 @@ street_count = 0
 outcome_count = 0
 total_count = 0
 
+# Display general event stats and close open files
 regions.each do |name, file|
   region_count = `wc -l data/#{name}`.split.first.to_i
   puts "#{name} has #{region_count} incidents"
@@ -53,6 +73,7 @@ regions.each do |name, file|
   file.close
 end
 
+# Close aggregate files
 street_file.close
 outcome_file.close
 

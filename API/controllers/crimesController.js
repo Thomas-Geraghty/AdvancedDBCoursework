@@ -1,10 +1,13 @@
 const mongodb = require('../data/mongodb')
 
+// Static crime types, generated from distinct values on the 'crime_type' field
 var crimeTypes = [
     "Anti-social behaviour", "Bicycle theft", "Burglary", "Criminal damage and arson",
     "Drugs", "Other crime", "Other theft", "Possession of weapons", "Public order",
     "Robbery", "Shoplifting", "Theft from the person", "Vehicle crime",
 ];
+
+// Static police regions, generated from distinct values on the 'falls_within' field
 var regions = [
     "Avon and Somerset Constabulary", "Bedfordshire Police", "British Transport Police",
     "Cambridgeshire Constabulary", "Cheshire Constabulary", "City of London Police",
@@ -22,6 +25,8 @@ var regions = [
     "Thames Valley Police", "Warwickshire Police", "West Mercia Police",
     "West Midlands Police", "West Yorkshire Police", "Wiltshire Police"
 ];
+
+// Static crime outcomes, generated from distinct values on the 'last_outcome_category' field
 var outcomes = [
     "Investigation complete; no suspect identified", "", "Status update unavailable",
     "Further investigation is not in the public interest", "Offender given a caution",
@@ -38,8 +43,10 @@ var outcomes = [
     "Further action is not in the public interest", "Under investigation"
 ];
 
+// Generated once on API start
 var stats;
 
+// Initialize the controller, run and cache expensive queries
 function intialize() {
     return new Promise((resolve) => {
         mongodb.intialize()
@@ -51,76 +58,26 @@ function intialize() {
     })
 }
 
+// Return static crime types
 function getCrimeTypes() {
     return crimeTypes;
 }
 
+// Return static regions
 function getRegions() {
     return regions;
 }
 
+// Return static crime outcomes
 function getOutcomes() {
     return outcomes;
 }
 
+// Generates the results for the stats page. Most of these are expensive, so run
+// on API startup and are saved unless the requirements change
 function generateStats() {
 
-    function getCrimesWithAnOutcome() {
-        const aggregation =
-            [
-                {
-                    $group: {
-                        _id: "$crime_type",
-                        with_outcome: {
-                            $sum: {
-                                $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                            }
-                        },
-                        without_outcome: {
-                            $sum: {
-                                $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                            }
-                        }
-                    }
-                },
-                {
-                    $sort: {
-                        _id: 1
-                    }
-                }
-            ]
-
-        return mongodb.getAggregate('crimes', aggregation);
-    }
-
-    function getRegionsWithOutcomes() {
-        const aggregation =
-            [
-                {
-                    $group: {
-                        _id: "$falls_within",
-                        with_outcome: {
-                            $sum: {
-                                $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 0, else: 1 }
-                            }
-                        },
-                        without_outcome: {
-                            $sum: {
-                                $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                            }
-                        }
-                    }
-                },
-                {
-                    $sort: {
-                        _id: 1
-                    }
-                }
-            ]
-
-        return mongodb.getAggregate('crimes', aggregation);
-    }
-
+    // Get number of crimes with an outcome vs without
     function getOutcomeRatio() {
         const aggregation =
             [
@@ -147,6 +104,7 @@ function generateStats() {
         return mongodb.getAggregate('crimes', aggregation);
     }
 
+    // Get count of each crime type
     function getCrimesByTypeCount() {
         const aggregation = [
             {
@@ -161,6 +119,7 @@ function generateStats() {
         return mongodb.getAggregate('crimes', aggregation );
     }
 
+    // Get count of crimes per region
     function getCrimesByRegionCount() {
         const aggregation = [
             {
@@ -178,6 +137,7 @@ function generateStats() {
         return mongodb.getAggregate('crimes', aggregation );
     }
 
+    // Get count of crimes per month
     function getCrimesByMonthCount() {
         const aggregation = [
             {
@@ -196,8 +156,8 @@ function generateStats() {
     }
 
     var promises = [
-        getCrimesWithAnOutcome(),
-        getRegionsWithOutcomes(),
+        getCrimesWithAnOutcome(false, false, false),
+        getRegionsWithOutcomes(false, false, false),
         getCrimesByTypeCount(),
         getCrimesByRegionCount(),
         getCrimesByMonthCount(),
@@ -219,14 +179,18 @@ function generateStats() {
     })
 }
 
+// Return the preloaded stats data
 function getStats() {
     return stats;
 }
 
+// Get the number of crimes defined by limit, starting at index
 function getCrimes(index, limit) {
     return mongodb.getRecords('crimes', { index: index, limit: limit });
 }
 
+// Get crimes inside the circle centered on location, with radius distance,
+// within the date range given
 function getCrimesNearby(location, distance, date) {
     const aggregation =
         [
@@ -251,11 +215,14 @@ function getCrimesNearby(location, distance, date) {
                     count: { $sum: 1 }
                 }
             }
-         ]
+        ]
 
     return mongodb.getAggregate('crimes', aggregation);
 }
 
+// Get crimes within a bounding box, within the date range (if specified),
+// matching the crime type given. Central location is defined by the center of
+// the bounding box, within a radius of the smallest of width and height.
 function getCrimesWithinArea(boundingBox, date_start, date_end, crime_type) {
     boundingBox = {
         NE: [ parseFloat(boundingBox.NE[0]), parseFloat(boundingBox.NE[1])],
@@ -309,90 +276,82 @@ function getCrimesWithinArea(boundingBox, date_start, date_end, crime_type) {
     return mongodb.getAggregate('crimes', aggregation);
 }
 
+// Groups crime types into those with outcomes and those without, within the
+// date range given (if specified), and the crime type given (if specified)
 function getCrimesWithAnOutcome(date_start, date_end, crime_type) {
-    const aggregation =
-        [
-            {
-                $match: {
-                    crime_type: crime_type,
-                    date: {
-                        $gte: date_start,
-                        $lt: date_end
-                    }
+    const aggregation = []
+
+    if (date_start) {
+        aggregation.push({ $match: { date: { $gte: date_start } } })
+    }
+    if (date_end) {
+        aggregation.push({ $match: { date: { $lt: date_end } } })
+    }
+    if (crime_type) {
+        aggregation.push({ $match: { crime_type: { $eq: crime_type } } })
+    }
+
+    aggregation.push({
+        $group: {
+            _id: "$crime_type",
+            with_outcome: {
+                $sum: {
+                    $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
                 }
             },
-            {
-                $group: {
-                    _id: "$crime_type",
-                    with_outcome: {
-                        $sum: {
-                            $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                        }
-                    },
-                    without_outcome: {
-                        $sum: {
-                            $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                        }
-                    }
-                }
-            },
-            {
-                $sort: {
-                    _id: 1
+            without_outcome: {
+                $sum: {
+                    $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
                 }
             }
-         ]
+        }
+    })
+    aggregation.push({ $sort: { _id: 1 } })
 
     return mongodb.getAggregate('crimes', aggregation);
 }
+
+// Groups crimes into regions, counting crimes with outcomes and those without,
+// within the date range given (if specified), and the crime type given (if
+// specified)
 
 function getRegionsWithOutcomes(date_start, date_end, crime_type) {
-    const aggregation =
-        [
-            {
-                $match: {
-                    crime_type: crime_type,
-                    date: {
-                        $gte: date_start,
-                        $lt: date_end
-                    }
+    const aggregation = []
+
+    if (date_start) {
+        aggregation.push({ $match: { date: { $gte: date_start } } })
+    }
+    if (date_end) {
+        aggregation.push({ $match: { date: { $lt: date_end } } })
+    }
+    if (crime_type) {
+        aggregation.push({ $match: { crime_type: { $eq: crime_type } } })
+    }
+
+    aggregation.push({
+        $group: {
+            _id: "$falls_within",
+            with_outcome: {
+                $sum: {
+                    $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
                 }
             },
-            {
-                $group: {
-                    _id: "$falls_within",
-                    with_outcome: {
-                        $sum: {
-                            $cond: { if: { $ne: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                        }
-                    },
-                    without_outcome: {
-                        $sum: {
-                            $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
-                        }
-                    }
-                }
-            },
-            {
-                $sort: {
-                    _id: 1
+            without_outcome: {
+                $sum: {
+                    $cond: { if: { $eq: [ "$last_outcome_category", "" ] }, then: 1, else: 0 }
                 }
             }
-         ]
+        }
+    })
+
+    aggregation.push({ $sort: { _id: 1 } })
 
     return mongodb.getAggregate('crimes', aggregation);
 }
 
-function getCrimesByType(type) {
-    return mongodb.getRecords('crimes', { query: { crime_type: type } });
-}
-
+// Returns crimes from a region, starting at <index>, running for <limit> crimes
 function getCrimesByRegion(region, index, limit) {
     return mongodb.getRecords('crimes', { query: { crime_type: region }, index: index, limit: limit });
-}
-
-function getSearchResults(query) {
-    return mongodb.getRecords('crimes', { query: { $text: { $search: query } } });
 }
 
 module.exports = {
@@ -407,6 +366,5 @@ module.exports = {
     getCrimesWithinArea: getCrimesWithinArea,
     getCrimesByRegion: getCrimesByRegion,
     getCrimesWithAnOutcome: getCrimesWithAnOutcome,
-    getRegionsWithOutcomes: getRegionsWithOutcomes,
-    getSearchResults: getSearchResults,
+    getRegionsWithOutcomes: getRegionsWithOutcomes
 }
