@@ -56,16 +56,21 @@ paths:
         description: "Location latitude to search from"
         required: true
         type: "number"
+        minimum: -90
+        maximum: 90
       - name: "long"
         in: "query"
         description: "Location longitude to search from"
         required: true
         type: "number"
+        minimum: -180
+        maximum: 180
       - name: "dist"
         in: "query"
         description: "Radius in meters from the given location to search within"
         required: true
         type: "integer"
+        minimum: 1
       - name: "date"
         in: "query"
         description: "Lower date bound. Range runs from this bound to current date"
@@ -79,6 +84,8 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Crime"
+        400:
+          description: "Parameter error"
   /crimes/within-area:
     get:
       tags:
@@ -136,6 +143,8 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Crime"
+        400:
+          description: "Parameter error"
   /crimes/regions:
     get:
       tags:
