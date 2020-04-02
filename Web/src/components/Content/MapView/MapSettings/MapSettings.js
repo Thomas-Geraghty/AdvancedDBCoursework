@@ -3,7 +3,7 @@ import "./MapSettings.scss";
 import { CrimeDataContext } from '../../CrimeDataContext';
 import { MapContext } from "../MapContext";
 
-const d = new Date(); 
+const d = new Date();
 
 export default function MapSearch() {
     const { cState } = React.useContext(CrimeDataContext);
