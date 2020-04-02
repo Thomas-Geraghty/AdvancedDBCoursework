@@ -9,7 +9,7 @@ export default function MapSearch() {
     const { cState } = React.useContext(CrimeDataContext);
     const { mState, mDispatch } = React.useContext(MapContext);
     const [ active, setActive ] = React.useState(false);
-    const [ startDate, setStartDate] = React.useState(dateFormatter(new Date(d.setMonth(d.getMonth() - 3))));
+    const [ startDate, setStartDate] = React.useState(dateFormatter(new Date(d.setMonth(d.getMonth() - 6))));
     const [ endDate, setEndDate ] = React.useState(dateFormatter(new Date() ));
     const [ crimeType, setCrimeType] = React.useState('All');
 
