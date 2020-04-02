@@ -74,7 +74,7 @@ db.crimes.aggregate([
             lsoa_name: 1, last_outcome_category: 1
         }
     },
-    { $out: "crimes_with_date" }
+    { $out: "crimes" }
 ])
 ```
 
