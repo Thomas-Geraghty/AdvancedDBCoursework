@@ -39,7 +39,8 @@ This will unset any `location` field where the `coordinates` are [ 0, 0 ]
 ```javascript
 db.crimes.updateMany(
   { "location.coordinates": [0.0, 0.0] },
-  { $unset: { location: 1 } } )
+  { $unset: { location: 1 } }
+)
 ```
 
 Use this to unset any empty `lsoa_code` and `lsoa_name` fields
@@ -68,7 +69,7 @@ db.crimes.aggregate([
             lsoa_name: 1, last_outcome_category: 1
         }
     },
-    { $out: "crimes" }
+    { $out: "crimes_with_date" }
 ])
 ```
 
