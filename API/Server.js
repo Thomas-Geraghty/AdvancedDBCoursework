@@ -39,26 +39,25 @@ function wrap_optional_parameters(endpoint, dataset, req, res) {
   }
 }
 
-// Create API routes, post initialization
+/**
+ * Create API routes, post initialization
+ * Check swagger.yaml for more info on these.
+ */ 
 function routes() {
   app.get('/api/crimes', (req, res) => {
-    var index;
+    let index;
     if (req.query.index) {
-      index = parseInt(req.query.index)
+      index = Math.max(0, parseInt(req.query.index));
     } else {
       index = 0
     }
 
-    index = Math.max(0, index)
-
-    var limit;
+    let limit;
     if (req.query.limit) {
-      limit = parseInt(req.query.limit)
+      limit = Math.max(1, parseInt(req.query.limit));
     } else {
       limit = 50
     }
-
-    limit = Math.max(1, limit)
 
     crimesController.getCrimes(index, limit).then(result => {
       res.json(result);
@@ -70,11 +69,11 @@ function routes() {
     var lon = parseFloat(req.query.lon)
 
     if ((lat < -90) || (lat > 90)) {
-      return res.json({error: "Latitude must be in the range -90 - 90"})
+      throw { status: 400, message: "Latitude must be in the range -90 - 90" }
     }
 
     if ((lon < -180) || (lon > 180)) {
-      return res.json({error: "Longitude must be in the range -180 - 180"})
+      throw { status: 400, message: "Longitude must be in the range -180 - 180" }
     }
 
     const location = {
@@ -85,7 +84,7 @@ function routes() {
     const distance = parseFloat(req.query.dist);
 
     if (distance < 0) {
-      return res.json({error: "Distance cannot be negative"})
+      throw { status: 400, message: "Distance cannot be negative" }
     }
 
     var date;
@@ -93,7 +92,7 @@ function routes() {
       date = new Date(req.query.date)
     } else {
       date = new Date()
-      date.setMonth(date.getMonth() - 3)
+      date.setMonth(date.getMonth() - 6)
     }
 
     crimesController.getCrimesNearby(location, distance, date)
@@ -112,19 +111,19 @@ function routes() {
     }
 
     if ((bounding_box.NE[0] < -90) || (bounding_box.NE[0] > 90)) {
-      return res.json({error: "NE latitude must be in the range -90 - 90"})
+      throw {status: 400, message: "NE latitude must be in the range -90 - 90"};
     }
 
     if ((bounding_box.SW[0] < -90) || (bounding_box.SW[0] > 90)) {
-      return res.json({error: "SW latitude must be in the range -90 - 90"})
+      throw {status: 400, message: "SW latitude must be in the range -90 - 90"};
     }
 
     if ((bounding_box.NE[1] < -180) || (bounding_box.NE[1] > 180)) {
-      return res.json({error: "NE longitude must be in the range -180 - 180"})
+      throw {status: 400, message: "NE longitude must be in the range -180 - 180"};
     }
 
     if ((bounding_box.SW[1] < -180) || (bounding_box.SW[1] > 180)) {
-      return res.json({error: "SW longitude must be in the range -180 - 180"})
+      throw {status: 400, message: "SW longitude must be in the range -180 - 180"};
     }
 
     var startDate, endDate, crimeType;
@@ -201,6 +200,38 @@ function routes() {
         res.json(crimesController.getStats());
         break;
     }
+  });
+
+  app.use(() => {
+    throw { status: 404, message: 'This API endpoint does not exist.' }
+  })
+
+  app.use((err, req, res) => {
+    let httpStatus;
+    switch(err.status) {
+      case 400:
+        httpStatus = 'Bad Request';
+        break;
+      case 404:
+        httpStatus = 'Not Found'
+        break;
+      case 500:
+        httpStatus = 'Internal Server Error'
+        break;
+    }
+
+    const errorObj = {
+      "ApiError": {
+        "ExceptionType": "ApiArgumentException",
+        "HttpStatus": httpStatus,
+        "HttpStatusCode": err.status,
+        "Message": err.message,
+        "RelativeUri": req.path,
+        "TimestampUtc": Date.now()
+      }
+    };
+    res.status(err.status)
+    res.json(errorObj);
   });
 }
 
