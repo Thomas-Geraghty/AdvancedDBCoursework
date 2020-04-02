@@ -2,7 +2,7 @@
  * API connection info.
  */
 const protocol = "https://";
-const hostname = process.env.REACT_APP_API_HOST || '127.0.0.1';
+const hostname = process.env.REACT_APP_API_HOST || window.location.hostname || '127.0.0.1';
 const port = '8443'
 const host = hostname + ':' + port
 

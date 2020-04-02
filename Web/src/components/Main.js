@@ -15,6 +15,7 @@ class Main extends Component {
                 <div className="content" key="content">
                     <Route exact path="/map" component={MapView} />
                     <Route exact path="/charts" component={ChartView} />
+                    <Route exact path="/" component={MapView} />
                 </div>
                 <Footer key="footer" />
             </HashRouter>
