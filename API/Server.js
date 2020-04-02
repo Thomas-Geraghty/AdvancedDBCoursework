@@ -42,7 +42,7 @@ function wrap_optional_parameters(endpoint, dataset, req, res) {
 /**
  * Create API routes, post initialization
  * Check swagger.yaml for more info on these.
- */ 
+ */
 function routes() {
   app.get('/api/crimes', (req, res) => {
     let index;
@@ -206,7 +206,7 @@ function routes() {
     throw { status: 404, message: 'This API endpoint does not exist.' }
   })
 
-  app.use((err, req, res) => {
+  app.use((err, req, res, next) => {
     let httpStatus;
     switch(err.status) {
       case 400:
