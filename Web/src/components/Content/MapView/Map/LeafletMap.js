@@ -71,12 +71,10 @@ export default function LeafletMap() {
      * Renders LeafletMap element, TileLayer (provided by OSM) and Marker elements.
      */
     return (
-        console.log("map render"),
         <Map
             viewport={mState.viewport}
             ref={map}
             onViewportChanged={(newviewport) => {
-                console.log("map viewport update");
                 mDispatch({ type: 'SET_VIEWPORT', payload: newviewport });
                 mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() });
             }}
