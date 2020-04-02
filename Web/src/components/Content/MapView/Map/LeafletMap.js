@@ -31,12 +31,13 @@ export default function LeafletMap() {
     function createMarker(crime) {
         if (mState.viewport.zoom > 10) {
             return <Marker
+                key={`${crime._id.coordinates[1]}-${crime._id.coordinates[0]}`}
                 position={[crime._id.coordinates[1], crime._id.coordinates[0]]}
                 icon={new L.divIcon({
                     html: `${createMarkerIcon(crime.count, crime.distribution_point)}`
                 })}
             >
-                <Popup>
+                <Popup autoPan={false}>
                     Crime count: {crime.count}
                     <br />
                     Handled by: {crime.falls_within}.
@@ -70,13 +71,16 @@ export default function LeafletMap() {
      * Renders LeafletMap element, TileLayer (provided by OSM) and Marker elements.
      */
     return (
+        console.log("map render"),
         <Map
             viewport={mState.viewport}
             ref={map}
             onViewportChanged={(newviewport) => {
+                console.log("map viewport update");
                 mDispatch({ type: 'SET_VIEWPORT', payload: newviewport });
                 mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() });
             }}
+            au
             onload={() => { mDispatch({ type: 'SET_VIEWBOUNDS', payload: map.current.leafletElement.getBounds() }) }}
         >
             <TileLayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png" attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
