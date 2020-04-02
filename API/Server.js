@@ -155,7 +155,7 @@ function routes() {
     validate_params({
       lat: { value: lat, rules: { min: -90, max: 90 } },
       lon: { value: lon, rules: { min: -180, max: 180 } },
-      dist: { value: dist, rules: { min: 1 } }
+      dist: { value: dist, rules: { min: 1, max: 10000 } }
     })
 
     var { lat, lon, dist } = format_params({
@@ -283,6 +283,8 @@ function routes() {
       case 'all':
         res.json(crimesController.getStats());
         break;
+      default:
+        throw { status: 404, message: 'This API endpoint does not exist.' }
     }
   });
 
