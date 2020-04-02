@@ -13,11 +13,7 @@ export function getCrimeTypes() {
     var path = `/api/crimes/types`
     var requestURL = protocol + host + path;
 
-    return new Promise((resolve) => {
-        get(requestURL).then((response) => {
-            resolve(response);
-        })
-    })
+    return get(requestURL);
 }
 
 /**
@@ -31,11 +27,7 @@ export function getCrimesWithinArea(boundingBox, startDate, endDate, crimeType) 
 
     var requestURL = protocol+ host + path + boundingBoxQuery + optionsQuery;
 
-    return new Promise((resolve) => {
-        get(requestURL).then((response) => {
-            resolve(response);
-        })
-    })
+    return get(requestURL);
 }
 
 /**
@@ -46,11 +38,7 @@ export function getCrimeStats(type) {
     var path = `/api/crimes/stats/${type}`
     var requestURL = protocol+ host + path;
 
-    return new Promise((resolve) => {
-        get(requestURL).then((response) => {
-            resolve(response);
-        })
-    })
+    return get(requestURL);
 }
 
 /**
