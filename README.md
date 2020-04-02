@@ -32,6 +32,11 @@ warnings. Visit `https://<host_ip>:8443/api/crimes/types` first and accept the
 security warnings before visiting `https://<host_ip>:3000/` for the main
 application
 
+## Importing the dataset
+
+`utils` contains a collection of scripts focused on importing data. See
+`utils/README.md` for details on how to use these scripts
+
 ## Tidying up the dataset
 
 This will unset any `location` field where the `coordinates` are [ 0, 0 ]

@@ -1,5 +1,8 @@
 # Utils
 
+The datasource used for these scripts is the UK street-level police open data,
+available at [https://data.police.uk/data/](https://data.police.uk/data/)
+
 ## combine.rb
 
 Takes files in a `data` directory relative to this script with the structure
