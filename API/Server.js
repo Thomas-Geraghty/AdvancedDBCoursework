@@ -40,6 +40,87 @@ function wrap_optional_parameters(endpoint, dataset, req, res) {
 }
 
 /**
+ * Takes an object specifiying required parameters. Throws an error with all
+ * invalid keys if any
+ */
+function required_params(params) {
+  errors = []
+  values = {}
+  for (param in params) {
+    var value = params[param]
+    if (!value) {
+      errors.push(param + " is required.")
+    } else {
+      values[param] = value
+    }
+  }
+  if (errors.length > 0) {
+    throw { status: 400, message: errors.join(' ') }
+  }
+  return values
+}
+
+/**
+ * Takes an object specifiying validation rules. Throws an error with all
+ * invalid values, if any. Object has the following struture:
+ * {
+ *   field: {
+ *     value: field,
+ *     rules: { min: -90, max: 90 }
+ *   }
+ * }
+ */
+function validate_params(params) {
+  errors = []
+  for (param in params) {
+    var value = params[param].value
+    var rules = params[param].rules
+    for (type in rules) {
+      var val
+      switch (type) {
+        case "min":
+          val = parseFloat(value)
+          if (val < rules[type]) {
+            errors.push(param + " must be at least " + rules[type] + ".")
+          }
+          break;
+        case "max":
+          val = parseFloat(value)
+          if (val > rules[type]) {
+            errors.push(param + " must be at most " + rules[type] + ".")
+          }
+          break;
+        case "min_len":
+          if (value.length < rules[type]) {
+            errors.push(param + " length must be at least " + rules[type] + ".")
+          }
+          break;
+        case "ne":
+          if (value == rules[type]) {
+            errors.push(param + " must not be " + rules[type] + ".")
+          }
+          break;
+      }
+    }
+  }
+  if (errors.length > 0) {
+    throw { status: 400, message: errors.join(' ') }
+  }
+}
+
+/**
+ * Takes an object specifiying parameters and a callback function. Returns an
+ * object with the same keys and values after being called back
+ */
+function format_params(params, callback) {
+  values = {}
+  for (param in params) {
+    values[param] = callback(params[param])
+  }
+  return values
+}
+
+/**
  * Create API routes, post initialization
  * Check swagger.yaml for more info on these.
  */
@@ -65,27 +146,23 @@ function routes() {
   });
 
   app.get('/api/crimes/nearby', (req, res) => {
-    var lat = parseFloat(req.query.lat)
-    var lon = parseFloat(req.query.lon)
+    var { lat, lon, dist } = required_params({
+      lat: req.query.lat,
+      lon: req.query.lon,
+      dist: req.query.dist
+    })
 
-    if ((lat < -90) || (lat > 90)) {
-      throw { status: 400, message: "Latitude must be in the range -90 - 90" }
-    }
+    validate_params({
+      lat: { value: lat, rules: { min: -90, max: 90 } },
+      lon: { value: lon, rules: { min: -180, max: 180 } },
+      dist: { value: dist, rules: { min: 1 } }
+    })
 
-    if ((lon < -180) || (lon > 180)) {
-      throw { status: 400, message: "Longitude must be in the range -180 - 180" }
-    }
+    var { lat, lon, dist } = format_params({
+      lat: lat, lon: lon, dist: dist
+    }, parseFloat)
 
-    const location = {
-      lat: lat,
-      lon: lon
-    }
-
-    const distance = parseFloat(req.query.dist);
-
-    if (distance < 0) {
-      throw { status: 400, message: "Distance cannot be negative" }
-    }
+    const location = { lat: lat, lon: lon }
 
     var date;
     if (req.query.date) {
@@ -95,41 +172,48 @@ function routes() {
       date.setMonth(date.getMonth() - 6)
     }
 
-    crimesController.getCrimesNearby(location, distance, date)
+    crimesController.getCrimesNearby(location, dist, date)
     .then(result => {
       res.json(result);
     })
   });
 
   app.get('/api/crimes/within-area', (req, res) => {
-    var ne = req.query.ne.split(',')
-    var sw = req.query.sw.split(',')
+    var { ne, sw, startDate, endDate, crimeType } = required_params({
+      ne: req.query.ne,
+      sw: req.query.sw,
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
+      crimeType: req.query.crimeType
+    })
+
+    ne = ne.split(',')
+    sw = sw.split(',')
+
+    validate_params({
+      ne: { value: ne, rules: { min_len: 2 } },
+      sw: { value: sw, rules: { min_len: 2 } }
+    })
+
+    var { ne_lat, ne_lon, sw_lat, sw_lon } = format_params({
+      ne_lat: ne[0], ne_lon: ne[1], sw_lat: sw[0], sw_lon: sw[1]
+    }, parseFloat)
+
+    validate_params({
+      ne_lat: { value: ne_lat, rules: { min: -90, max: 90, ne: 0} },
+      ne_lon: { value: ne_lon, rules: { min: -180, max: 180, ne: 0} },
+      sw_lat: { value: sw_lat, rules: { min: -90, max: 90, ne: 0} },
+      sw_lon: { value: sw_lon, rules: { min: -180, max: 180, ne: 0} }
+    })
 
     bounding_box = {
-      NE: [ parseFloat(ne[0]), parseFloat(ne[1])],
-      SW: [ parseFloat(sw[0]), parseFloat(sw[1])]
+      NE: [ ne_lat, ne_lon ],
+      SW: [ sw_lat, sw_lon ]
     }
 
-    if ((bounding_box.NE[0] < -90) || (bounding_box.NE[0] > 90)) {
-      throw {status: 400, message: "NE latitude must be in the range -90 - 90"};
-    }
-
-    if ((bounding_box.SW[0] < -90) || (bounding_box.SW[0] > 90)) {
-      throw {status: 400, message: "SW latitude must be in the range -90 - 90"};
-    }
-
-    if ((bounding_box.NE[1] < -180) || (bounding_box.NE[1] > 180)) {
-      throw {status: 400, message: "NE longitude must be in the range -180 - 180"};
-    }
-
-    if ((bounding_box.SW[1] < -180) || (bounding_box.SW[1] > 180)) {
-      throw {status: 400, message: "SW longitude must be in the range -180 - 180"};
-    }
-
-    var startDate, endDate, crimeType;
-    startDate = new Date(req.query.startDate)
-    endDate = new Date(req.query.endDate)
-    crimeType = req.query.crimeType === 'All' ? null : req.query.crimeType
+    startDate = new Date(startDate)
+    endDate = new Date(endDate)
+    crimeType = crimeType === 'All' ? null : crimeType
 
     crimesController.getCrimesWithinArea(bounding_box, startDate, endDate, crimeType)
     .then(result => {
@@ -217,6 +301,10 @@ function routes() {
         break;
       case 500:
         httpStatus = 'Internal Server Error'
+        break;
+      case undefined:
+        httpStatus = 'Internal Server Error'
+        err.status = 500
         break;
     }
 
