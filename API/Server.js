@@ -240,15 +240,24 @@ function routes() {
   });
 
   app.get('/api/crimes/regions', (req, res) => {
-    res.json(crimesController.getRegions());
+    crimesController.getRegions()
+    .then(result => {
+      res.json(result);
+    })
   });
 
   app.get('/api/crimes/types', (req, res) => {
-    res.json(crimesController.getCrimeTypes());
+    crimesController.getCrimeTypes()
+    .then(result => {
+      res.json(result);
+    })
   });
 
   app.get('/api/crimes/outcomes', (req, res) => {
-    res.json(crimesController.getOutcomes());
+    crimesController.getOutcomes()
+    .then(result => {
+      res.json(result);
+    })
   });
 
   app.get('/api/crimes/stats/:type', (req, res) => {
@@ -266,7 +275,6 @@ function routes() {
           crimesController.getStats().outcomesByRegion,
           req, res
         )
-        res.json(crimesController.getStats().outcomesByRegion);
         break;
       case 'outcome-ratio':
         res.json(crimesController.getStats().outcomeRatio);
