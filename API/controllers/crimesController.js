@@ -1,48 +1,5 @@
 const mongodb = require('../data/mongodb')
 
-// Static crime types, generated from distinct values on the 'crime_type' field
-var crimeTypes = [
-    "Anti-social behaviour", "Bicycle theft", "Burglary", "Criminal damage and arson",
-    "Drugs", "Other crime", "Other theft", "Possession of weapons", "Public order",
-    "Robbery", "Shoplifting", "Theft from the person", "Vehicle crime",
-];
-
-// Static police regions, generated from distinct values on the 'falls_within' field
-var regions = [
-    "Avon and Somerset Constabulary", "Bedfordshire Police", "British Transport Police",
-    "Cambridgeshire Constabulary", "Cheshire Constabulary", "City of London Police",
-    "Cleveland Police", "Cumbria Constabulary", "Derbyshire Constabulary",
-    "Devon & Cornwall Police", "Dorset Police", "Durham Constabulary",
-    "Dyfed-Powys Police", "Essex Police", "Gloucestershire Constabulary",
-    "Greater Manchester Police", "Gwent Police", "Hampshire Constabulary",
-    "Hertfordshire Constabulary", "Humberside Police", "Kent Police",
-    "Lancashire Constabulary", "Leicestershire Police", "Lincolnshire Police",
-    "Merseyside Police", "Metropolitan Police Service", "Norfolk Constabulary",
-    "North Wales Police", "North Yorkshire Police", "Northamptonshire Police",
-    "Northumbria Police", "Nottinghamshire Police", "Police Service of Northern Ireland",
-    "South Wales Police", "South Yorkshire Police", "Staffordshire Police",
-    "Suffolk Constabulary", "Surrey Police", "Sussex Police",
-    "Thames Valley Police", "Warwickshire Police", "West Mercia Police",
-    "West Midlands Police", "West Yorkshire Police", "Wiltshire Police"
-];
-
-// Static crime outcomes, generated from distinct values on the 'last_outcome_category' field
-var outcomes = [
-    "Investigation complete; no suspect identified", "", "Status update unavailable",
-    "Further investigation is not in the public interest", "Offender given a caution",
-    "Unable to prosecute suspect", "Offender given a drugs possession warning",
-    "Court result unavailable", "Court case unable to proceed",
-    "Offender given community sentence", "Offender given suspended prison sentence",
-    "Formal action is not in the public interest", "Local resolution",
-    "Offender given conditional discharge", "Offender sent to prison",
-    "Offender ordered to pay compensation", "Offender given penalty notice",
-    "Offender fined", "Awaiting court outcome", "Suspect charged as part of another case",
-    "Defendant found not guilty", "Action to be taken by another organisation",
-    "Offender otherwise dealt with", "Offender deprived of property",
-    "Defendant sent to Crown Court", "Offender given absolute discharge",
-    "Further action is not in the public interest", "Under investigation"
-];
-
 // Generated once on API start
 var stats;
 
@@ -60,17 +17,17 @@ function intialize() {
 
 // Return static crime types
 function getCrimeTypes() {
-    return crimeTypes;
+    return mongodb.getDistinct("crimes", "crime_type")
 }
 
 // Return static regions
 function getRegions() {
-    return regions;
+    return mongodb.getDistinct("crimes", "falls_within")
 }
 
 // Return static crime outcomes
 function getOutcomes() {
-    return outcomes;
+    return mongodb.getDistinct("crimes", "last_outcome_category")
 }
 
 // Generates the results for the stats page. Most of these are expensive, so run
