@@ -45,19 +45,19 @@ export default ({ children }) => {
           cDispatch({ type: 'SET_NEARBY', payload: result })
         });
     }
-  }, [mState.viewbounds, mState.map_settings])
 
-  /**
-  * Gets crime types and sets them into the context state.
-  * Accessible by any component that subscribes to this context provider.
-  */
-  useEffect(() => {
-    getCrimeTypes()
+    /**
+    * Gets crime types and sets them into the context state.
+    * Accessible by any component that subscribes to this context provider.
+    */
+    if (cState.crime_types.length == 0) {
+      getCrimeTypes()
       .then(result => {
         result.push('All')
         cDispatch({ type: 'SET_CRIME_TYPES', payload: result })
-      });
-  }, [])
+      })
+    }
+  }, [mState.viewbounds, mState.map_settings])
 
   const CrimeData = { cState, cDispatch }
 
