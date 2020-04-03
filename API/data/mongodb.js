@@ -43,14 +43,9 @@ module.exports = {
     },
 
     // runs a distinct on the given collection, defined by the options
-    getDistinct: (collection, options) => {
-        if(typeof options.query == "undefined") { options.query = {} };
-        if(typeof options.fields == "undefined") { options.fields = { _id: 0 } };
-        if(typeof options.index == "undefined") { options.index = 0 };
-        if(typeof options.limit == "undefined") { options.limit = 0 };
-
+    getDistinct: (collection, query) => {
         return new Promise((resolve) => {
-            _db.collection(collection).distinct(options.query, function (err, result) {
+            _db.collection(collection).distinct(query, function (err, result) {
                 resolve(result);
             });
         })
