@@ -38,11 +38,11 @@ export default function LeafletMap() {
                 })}
             >
                 <Popup autoPan={false}>
-                    Crime count: {crime.count}
+                    Total crimes: {crime.count}
                     <br />
-                    Handled by: {crime.falls_within}.
+                    Handled by: {crime.falls_within.join(', ')}.
                     <br />
-                    Location: {crime.street_name}.
+                    Crimes: {crime.crime_counts.join(', ')}.
                     <br />
                     </Popup>
             </Marker>
@@ -52,11 +52,11 @@ export default function LeafletMap() {
             value = distribution_point
             var sizeValue = Math.min(Math.max(value/2, 25), 200)
             var colorValue = 100 - distribution_point;
-        
+
             return `<svg height="${sizeValue}" width="${sizeValue}">
                         <circle cx="${sizeValue/2}" cy="${sizeValue/2}" r="${(sizeValue/2)}" fill=${perc2color(colorValue)} />
                     </svg>`
-        
+
             function perc2color(perc) {
                 var r, g, b = 0;
                 r = 255;

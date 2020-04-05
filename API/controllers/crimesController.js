@@ -218,12 +218,83 @@ function getCrimesWithinArea(boundingBox, date_start, date_end, crime_type) {
 
     aggregation.push({
         $group: {
-            _id: "$location",
-            count: { $sum: 1 },
-            street_name: { "$first": "$street_name" },
-            falls_within: { "$first": "$falls_within" }
+            _id: { location: "$location", crime_type: "$crime_type" },
+            crime_count: { $sum: 1 },
+            falls_within: { "$push": "$falls_within" }
         }
     })
+
+    aggregation.push({
+        $project: {
+            crime_and_count: {
+                $concat: [ "$_id.crime_type", ": ", { "$toString": "$crime_count" } ]
+            },
+            location: "$_id.location",
+            crime_count: 1,
+            falls_within: 1
+        }
+    })
+
+    aggregation.push({
+        $group: {
+            _id: "$location",
+            count: { $sum: "$crime_count" },
+            crime_counts: { $addToSet: "$crime_and_count" },
+            falls_within: { $push: "$falls_within" }
+        }
+    })
+
+    aggregation.push({
+        $project: {
+            _id: 0, location: "$_id", count: 1, crime_counts: 1,
+            falls_within: {
+                $reduce: {
+                    input: "$falls_within",
+                    initialValue: [],
+                    in: { $setUnion: [ "$$value", "$$this" ] }
+                }
+            }
+        }
+    })
+
+    aggregation.push(
+        { $unwind: "$falls_within" },
+        { $sort: { falls_within: 1 } },
+        {
+            $group: {
+                _id: { location: "$location", count: "$count", crime_counts: "$crime_counts" },
+                falls_within: { $push: "$falls_within" }
+            }
+        },
+        {
+            $project: {
+                location: "$_id.location",
+                crime_counts: "$_id.crime_counts",
+                count: "$_id.count",
+                falls_within: 1,
+                _id: 0
+            }
+        }
+    )
+
+    aggregation.push(
+        { $unwind: "$crime_counts" },
+        { $sort: { crime_counts: 1 } },
+        {
+            $group: {
+                _id: { location: "$location", count: "$count", falls_within: "$falls_within" },
+                crime_counts: { $push: "$crime_counts" }
+            }
+        },
+        {
+            $project: {
+                _id: "$_id.location",
+                falls_within: "$_id.falls_within",
+                count: "$_id.count",
+                crime_counts: 1
+            }
+        }
+    )
 
     return mongodb.getAggregate('crimes', aggregation);
 }
